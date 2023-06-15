@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigInteger;
+import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -49,14 +51,28 @@ public class UserRepoTest {
 	}
 	
 	@Test void saveUser_FindSavedUserById_FoundUserIsNotNullTest(){
-	
+		Optional<User> foundUser = userRepository.findById(savedUser.getId());
+		User user = null;
+		if (foundUser.isPresent())
+			user = foundUser.get();
+		assertEquals(user, savedUser);
+		assertThat(foundUser).isPresent();
+		assertNotNull(foundUser.get().getId());
 	}
 	
 	@Test void saveUser_DeleteSavedUserById_FindDeletedUserById_deletedUserDoesExistInTheDatabase(){
-	
+		userRepository.deleteById(savedUser.getId());
+		assertFalse(userRepository.existsById(savedUser.getId()));
 	}
 	
 	@Test void getAllUsersExistingInTheDatabaseTest(){
+	
+	}
+	
+	@Test void findAllCustomersTest(){
+	
+	}
+	@Test void findAllAdminTest(){
 	
 	}
 }
