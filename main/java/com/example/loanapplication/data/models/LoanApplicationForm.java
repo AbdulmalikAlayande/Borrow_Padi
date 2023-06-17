@@ -2,8 +2,6 @@ package com.example.loanapplication.data.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Any;
-import org.hibernate.annotations.ManyToAny;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,24 +13,21 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoanApplicationForm {
-	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@NonNull
-	private String userId;
-	@NonNull
+	private Long applicationFormId;
 	private String requestedTermsAndCondition;
 	@NonNull
 	private BigDecimal loanAmount;
 	@NonNull
 	private String loanPurpose;
 	@NonNull
+	@Enumerated(EnumType.STRING)
 	private PaymentMethod repaymentPreference;
 	@NonNull
+	@Enumerated(EnumType.STRING)
 	private LoanStatus status;
-	@NonNull
-	@Embedded
-	private BankInfo info;
 	@NonNull
 	private String loanRejectionReason;
 	@NonNull

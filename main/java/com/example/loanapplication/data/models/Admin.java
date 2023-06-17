@@ -1,19 +1,21 @@
 package com.example.loanapplication.data.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
-@Data
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-public class Admin extends User{
-	private String name;
-	private String password;
-	private String id;
-	private String email;
-	private String phoneNumber;
+@Entity
+@Getter
+@Setter
+public class Admin{
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private String adminId;
+	@NonNull
+	@OneToOne
+	private User user;
+	@NonNull
 	private String adminCode;
 }

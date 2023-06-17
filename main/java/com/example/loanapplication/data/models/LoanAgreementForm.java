@@ -1,10 +1,7 @@
 package com.example.loanapplication.data.models;
 
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -20,7 +17,7 @@ public class LoanAgreementForm {
 	@NonNull
 	private String requestedTermsAndCondition;
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.UUID)
 	private String id;
 	@NonNull
 	private LocalDate applicationDate;
@@ -33,5 +30,6 @@ public class LoanAgreementForm {
 	@NonNull
 	private BigDecimal repaymentAmount;
 	@NonNull
+	@Enumerated(EnumType.STRING)
 	private PaymentMethod repaymentPreference;
 }
