@@ -24,6 +24,7 @@ public class UserRepoTest {
 	User user;
 	User savedUser;
 	
+	
 	@BeforeEach
 	void startAllTestWith(){
 		userRepository.deleteAll();
@@ -82,16 +83,8 @@ public class UserRepoTest {
 				       .email("alaabdulmalk03@gmail.com")
 				       .password("ayanniyi20")
 				       .phoneNumber("12434570")
-				       .info(builtBankInfo())
-				       .name("abdulmalik")
-				       .build();
-	}
-	private BankInfo builtBankInfo(){
-		return BankInfo.builder()
-				       .accountNumber("3567289")
-				       .bvn("3718920")
-				       .bankName("uba")
-				       .name("abdulmalik")
+				       .firstName("abdulmalik")
+				       .lastName("alayande")
 				       .build();
 	}
 }

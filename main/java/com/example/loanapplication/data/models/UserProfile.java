@@ -22,4 +22,7 @@ public class UserProfile {
 	private LoanPaymentRecord record;
 	@OneToOne
 	private Address address;
+	@org.springframework.lang.NonNull
+	@OneToOne(cascade = CascadeType.ALL)
+	private BankInfo info;
 }

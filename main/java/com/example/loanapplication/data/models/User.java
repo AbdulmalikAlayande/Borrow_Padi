@@ -11,16 +11,14 @@ import org.springframework.lang.NonNull;
 @Builder
 public class User {
 	@NonNull
-	private String name;
+	private String firstName;
+	@NonNull
+	private String lastName;
+	@NonNull
 	private String password;
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private String userId;
-	@Column(unique = true)
 	private String email;
-	@NonNull
-	@OneToOne(cascade = CascadeType.ALL)
-	private BankInfo info;
-	@Column(unique = true)
 	private String phoneNumber;
 }

@@ -17,11 +17,9 @@ public class Customer{
 	@NonNull
 	@OneToOne
 	private User user;
-	@NonNull
 	@OneToMany
 	private List<LoanApplicationForm> applicationFormSet;
 	@OneToMany
-	@NonNull
 	private List<LoanAgreementForm> agreementForms;
 }
                                                                                                         
