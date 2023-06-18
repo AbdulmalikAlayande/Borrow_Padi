@@ -1,11 +1,25 @@
 package com.example.loanapplication.data.models;
 
-import java.math.BigDecimal;
+import jakarta.persistence.*;
+import lombok.*;
 
+import java.math.BigDecimal;
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Entity
 public class UserProfile {
-	private String userId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private String profileId;
+	@NonNull
+	@OneToOne
+	private User user;
 	private BigDecimal loanLimit;
 	private int loanLevel;
+	@Enumerated(EnumType.STRING)
 	private LoanPaymentRecord record;
+	@OneToOne
 	private Address address;
 }
