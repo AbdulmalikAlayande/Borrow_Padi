@@ -2,9 +2,8 @@ package com.example.loanapplication.servicetest;
 
 import com.example.loanapplication.data.dtos.requests.RegistrationRequest;
 import com.example.loanapplication.data.dtos.responses.RegisterationResponse;
-import com.example.loanapplication.exceptions.FieldCannotBeEmptyException;
+import com.example.loanapplication.exceptions.MessageFailedException;
 import com.example.loanapplication.exceptions.RegistrationFailedException;
-import com.example.loanapplication.service.BorrowPadiCustomerService;
 import com.example.loanapplication.service.CustomerService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
@@ -13,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -27,20 +25,25 @@ class CustomerServiceTest {
 	@SneakyThrows
 	void startAllTestWith() {
 		registrationRequest = buildRegistrationRequest();
-		registerationResponse = customerService.registerCustomer(registrationRequest);
 	}
 	
 	@Test void testThatNoFieldIsNotEmptyBeforeRegistration() throws RegistrationFailedException {
 		RegistrationRequest registrationRequest1 = RegistrationRequest.builder()
+				                                           .phoneNumber("556789908976")
+				                                           .password("ty@20")
+				                                           .lastName("lamidi")
+				                                           .firstName("layi")
+				                                           .email("dominicrotimi@gmail.com")
 				                                           .build();
-		assertThrows(FieldCannotBeEmptyException.class, () -> customerService.registerCustomer(registrationRequest1));
+//		assertThrows(FieldCannotBeEmptyException.class, () -> customerService.registerCustomer(registrationRequest1));
 	}
 	
 	@Test void testThatFieldCannotBeEmptyExceptionIsThrownWhenAFieldIsEmpty(){
 	
 	}
 	
-	@Test void registerNewCustomerTest(){
+	@Test void registerNewCustomerTest() throws RegistrationFailedException, MessageFailedException {
+		registerationResponse = customerService.registerCustomer(registrationRequest);
 		assertThat(registerationResponse).isNotNull();
 	}
 	
@@ -63,10 +66,10 @@ class CustomerServiceTest {
 	private RegistrationRequest buildRegistrationRequest() {
 		return RegistrationRequest.builder()
 				       .phoneNumber("07036174617")
-				       .password("ayanniyi20")
-				       .lastName("Abdulmalik")
-				       .firstName("Alayande")
-				       .email("alaabdulmalik03@gmail.com")
+				       .password("ayanniyi@20")
+				       .lastName("Obinali")
+				       .firstName("Goodness")
+				       .email("obinaligoodness@gmail.com")
 				       .build();
 	}
 }

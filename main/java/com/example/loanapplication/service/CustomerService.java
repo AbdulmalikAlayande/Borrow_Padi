@@ -7,7 +7,7 @@ import com.example.loanapplication.data.dtos.updateresponse.UpdateResponse;
 import com.example.loanapplication.exceptions.*;
 
 public interface CustomerService {
-	RegisterationResponse registerCustomer(RegistrationRequest registerationRequest) throws RegistrationFailedException, FieldCannotBeEmptyException;
+	RegisterationResponse registerCustomer(RegistrationRequest registerationRequest) throws RegistrationFailedException, FieldCannotBeEmptyException, MessageFailedException;
 	LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException;
 	void agreeToTermsAndConditionForLoanApplication();
 	UpdateResponse updateDetails(UpdateRequest updateRequest);
