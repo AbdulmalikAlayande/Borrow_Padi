@@ -12,4 +12,6 @@ public interface CustomerService {
 	void agreeToTermsAndConditionForLoanApplication();
 	UpdateResponse updateDetails(UpdateRequest updateRequest);
 	LoanStatusViewResponse viewLoanStatus(LoanStatusViewRequest loanStatusViewRequest) throws NoSuchLoanException;
+	
+	void deleteAll();
 }

@@ -43,7 +43,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 		}
 		Customer savedCustomer = customerRepo.save(customer);
 		log.info("Registration for Customer {} is Successful", savedCustomer);
-		notifyCustomerThatRegistrationIsSuccessful(registrationRequest);
+//		notifyCustomerThatRegistrationIsSuccessful(registrationRequest);
 		return Mapper.map(savedCustomer);
 	}
 	
@@ -53,12 +53,12 @@ public class BorrowPadiCustomerService implements CustomerService{
 		mailService.emailCustomerToVerifyTheirCustomer(emailRequest);
 	}
 	
-	private void validateCustomerEmailCredentials(RegistrationRequest registrationRequest) throws RegistrationFailedException {
+	public void validateCustomerEmailCredentials(RegistrationRequest registrationRequest) throws RegistrationFailedException {
 		try{
 			mailService.isValidEmail(registrationRequest.getEmail());
 			mailService.isValidPassword(registrationRequest.getPassword());
 		}catch (IllegalArgumentException exception){
-			throw new RegistrationFailedException(exception.getMessage());
+			throw new RegistrationFailedException("Registration Failed::\nCaused by"+exception.getMessage());
 		}
 	}
 	
@@ -84,5 +84,10 @@ public class BorrowPadiCustomerService implements CustomerService{
 	
 	public LoanStatusViewResponse viewLoanStatus(LoanStatusViewRequest loanStatusViewRequest) throws NoSuchLoanException {
 		return null;
+	}
+	
+	@Override
+	public void deleteAll() {
+		customerRepo.deleteAll();
 	}
 }

@@ -58,61 +58,61 @@ public class Mailer {
 	private String htmlContent(String username){
 		return """
 				<!Doctype html>
-				\t\t\t\t<html lang="en">
-				\t\t\t\t\t<head>
-				\t\t\t\t        <meta charset="UTF-8">
-				\t\t\t\t        <style>
-				\t\t\t\t            .Registration_Div{
-				\t\t\t\t                align-content: space-evenly;
-				\t\t\t\t                justify-content: center;
-				\t\t\t\t                align-items: center;
-				\t\t\t\t                display: grid;
-				\t\t\t\t            }
-				\t\t\t\t            button{
-				\t\t\t\t                border-style: solid;
-				\t\t\t\t                background-color: rgba(230, 24, 86, 1);
-				\t\t\t\t                height: 30px;
-				\t\t\t\t                width: 120px;
-				\t\t\t\t                font-size: 15px;
-				\t\t\t\t                color: white;
-				\t\t\t\t                border-radius: 20px;
-				\t\t\t\t            }
-				\t\t\t\t            button:hover{
-				\t\t\t\t\t            transform: scale(0.2);
-				\t\t\t\t\t            background-image: linear-gradient(180deg, #1E3448 99.99%, rgba(30, 52, 72, 0) 100%);
-				\t\t\t\t\t            color: white;
-				\t\t\t\t            }
-				\t\t\t\t            h1{
-				\t\t\t\t                font-size: 35px;
-				\t\t\t\t            }
-				\t\t\t\t            .Registration_Div p{
-				\t\t\t\t                font-size: 20px;
-				\t\t\t\t            }
-				\t\t\t\t            .thanks_div{
-				\t\t\t\t                color: blue;
-				\t\t\t\t                font-size: 20px;
-				\t\t\t\t            }
-				\t\t\t\t        </style>
-				\t\t\t\t        <title>Registration Updates</title>
-				\t\t\t\t    </head>
-				\t\t\t\t    <body>
-				\t\t\t\t        <div class='Registration_Div'>
-				\t\t\t\t            <h1>Registration Successful</h1>
-				\t\t\t\t            <p>Hi, if you receive this email then you have access to your account,<br>we just want to be sure
-				\t\t\t\t                you have access to your email account,<br>please kindly click the button below to verify your account</p>
-				\t\t\t\t            <div>
-				\t\t\t\t                <button>Verify Account</button>
-				\t\t\t\t            </div>
-				\t\t\t\t            <div>
-				\t\t\t\t                <p>
-				\t\t\t\t                    Contact us at <span><a>+2347036174617</a></span> for further support
-				\t\t\t\t                </p>
-				\t\t\t\t            </div>
-				\t\t\t\t            <div class='thanks_div'>
-				\t\t\t\t                <p>Thanks for your cooperation</p>
-				\t\t\t\t            </div>
-				\t\t\t\t        </div>
-				\t\t\t\t\t</body>
-				\t\t\t\t</html>""";
+				<html lang="en">
+				<head>
+					<meta charset="UTF-8">
+				    <style>
+				        .Registration_Div{
+					        align-content: space-evenly;
+					        justify-content: center;
+					        align-items: center;
+					        display: grid;
+				        }
+						button{
+				            border-style: solid;
+				            background-color: rgba(230, 24, 86, 1);
+				            height: 30px;
+				            width: 120px;
+				            font-size: 15px;
+				            color: white;
+				            border-radius: 20px;
+				        }
+				        button:hover{
+				            transform: scale(0.2);
+				            background-image: linear-gradient(180deg, #1E3448 99.99%, rgba(30, 52, 72, 0) 100%);
+				            color: white;
+				        }
+				        h1{
+				            font-size: 35px;
+				        }
+				        .Registration_Div p{
+				            font-size: 20px;
+				        }
+				        .thanks_div{
+				            color: blue;
+				            font-size: 20px;
+				        }
+				    </style>
+				    <title>Registration Updates</title>
+				</head>
+				<body>
+					<div class='Registration_Div'>
+					    <h1>Registration Successful</h1>
+						<p>Hi, if you receive this email then you have access to your account,<br>we just want to be sure
+						you have access to your email account,<br>please kindly click the button below to verify your account</p>
+					<div>
+					<button>Verify Account</button>
+				    </div>
+					<div>
+				         <p>
+				            Contact us at <span><a>+2347036174617</a></span> for further support
+				         </p>
+				         </div>
+			        <div class='thanks_div'>
+				        <p>Thanks for your cooperation</p>
+				     </div>
+				       </div>
+				</body>
+				</html>""";
 	}
 }
