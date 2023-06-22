@@ -108,11 +108,12 @@ public class Mailer {
 				            Contact us at <span><a>+2347036174617</a></span> for further support
 				         </p>
 				         </div>
-			        <div class='thanks_div'>
-				        <p>Thanks for your cooperation</p>
-				     </div>
-				       </div>
+				         <div class='thanks_div'>
+				         <p>Thanks for your cooperation</p>
+				    </div>
+				    </div>
 				</body>
-				</html>""";
+				</html>
+				""";
 	}
 }
