@@ -3,6 +3,7 @@ package com.example.loanapplication.servicetest;
 import com.example.loanapplication.data.dtos.requests.LoanApplicationRequest;
 import com.example.loanapplication.data.dtos.requests.RegistrationRequest;
 import com.example.loanapplication.data.dtos.responses.RegisterationResponse;
+import com.example.loanapplication.exceptions.LoanApplicationFailedException;
 import com.example.loanapplication.exceptions.RegistrationFailedException;
 import com.example.loanapplication.service.CustomerService;
 import lombok.SneakyThrows;
@@ -82,7 +83,14 @@ class CustomerServiceTest {
 				                                            .loanPurpose("For feeding")
 				                                            .userPin("1968")
 				                                            .loanTenure(30)
+				                                            .repaymentPreference("CASH")
+				                                            .password("tyson@20")
 				                                            .build();
+		
+		assertThatThrownBy(() -> {
+			customerService.applyForLoan(applicationRequest);
+		}).isInstanceOf(LoanApplicationFailedException.class)
+				.hasMessageContaining("You don't have an account with us, please register to borrow loan");
 	}
 	
 	@AfterEach

@@ -22,9 +22,7 @@ public class LoanApplicationRequest {
 	private String loanPurpose;
 	@NonNull
 	@Enumerated(EnumType.STRING)
-	private PaymentMethod repaymentPreference;
-	@NonNull
-	private String loanRejectionReason;
+	private String repaymentPreference;
 	@org.springframework.lang.NonNull
 	private String password;
 	private String userPin;

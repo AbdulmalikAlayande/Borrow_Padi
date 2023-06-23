@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 public class BorrowPadiCustomerService implements CustomerService{
 	
 	private final CustomerRepo customerRepo;
+	private final AddressService addressService;
 	private final UserRepository userRepository;
 	MailService mailService;
 	
@@ -71,7 +72,15 @@ public class BorrowPadiCustomerService implements CustomerService{
 	}
 	
 	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException{
+		checkIfUserExists(loanApplicationRequest);
 		return null;
+	}
+	
+	private void checkIfUserExists(LoanApplicationRequest loanApplicationRequest) {
+		String username = loanApplicationRequest.getUserName();
+		String userPassword = loanApplicationRequest.getPassword();
+		String userPin = loanApplicationRequest.getUserPin();
+//		userRepository.
 	}
 	
 	public void agreeToTermsAndConditionForLoanApplication(){
