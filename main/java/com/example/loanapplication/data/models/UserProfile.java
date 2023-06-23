@@ -25,4 +25,6 @@ public class UserProfile {
 	@org.springframework.lang.NonNull
 	@OneToOne(cascade = CascadeType.ALL)
 	private BankInfo info;
+	private String userPin;
+	private String username;
 }

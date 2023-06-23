@@ -1,8 +1,8 @@
 package com.example.loanapplication.servicetest;
 
+import com.example.loanapplication.data.dtos.requests.LoanApplicationRequest;
 import com.example.loanapplication.data.dtos.requests.RegistrationRequest;
 import com.example.loanapplication.data.dtos.responses.RegisterationResponse;
-import com.example.loanapplication.exceptions.MessageFailedException;
 import com.example.loanapplication.exceptions.RegistrationFailedException;
 import com.example.loanapplication.service.CustomerService;
 import lombok.SneakyThrows;
@@ -12,6 +12,8 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -74,7 +76,13 @@ class CustomerServiceTest {
 	}
 	
 	@RepeatedTest(2) void userHasToRegisterBeforeTheyCanApplyForLoanTest(){
-		
+		LoanApplicationRequest applicationRequest = LoanApplicationRequest.builder()
+				                                            .loanAmount(BigDecimal.valueOf(40_000))
+				                                            .userName("Christmas")
+				                                            .loanPurpose("For feeding")
+				                                            .userPin("1968")
+				                                            .loanTenure(30)
+				                                            .build();
 	}
 	
 	@AfterEach
