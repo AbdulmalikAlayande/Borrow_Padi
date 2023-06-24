@@ -62,16 +62,13 @@ class AddressServiceTest {
 		assertNotNull(response.get().getAddressId());
 	}
 	
-	@Test void saveAddress_FindSavedAddressByUserIdTest(){
-		Optional<AddressResponse> response = addressService.findAddressByUserId(addressResponse.getAddressId());
-		
-	}
-	
 	@Test void saveAddress_FindSavedAddressByPostCode(){
 		Optional<List<AddressResponse>> response = addressService.findAllAddressByPostCode(addressRequest.getPostCode());
 		response.ifPresent(AddressResponse->{
-			assertNotNull(response.get());
-			assertNotNull(response.get());
+			response.get().forEach(x -> {
+				assertNotNull(x);
+				assertNotNull(x.getAddressId());
+			});
 		});
 	}
 }

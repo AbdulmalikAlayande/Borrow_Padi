@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface AddressService{
 	
 	AddressResponse saveAddress(AddressRequest addressRequest) throws FieldCannotBeEmptyException;
-	Optional<AddressResponse> findAddressByUserId(String userId);
+	
 	Optional<AddressResponse> findAddressById(String addressId) throws ObjectDoesNotExistException;
 	Optional<List<AddressResponse>> findAllAddressByPostCode(String postCode);
 	Optional<List<AddressResponse>> findAllAddressByCityAndState(String city, String state);

@@ -10,6 +10,7 @@ import com.example.loanapplication.data.dtos.responses.RegisterationResponse;
 import com.example.loanapplication.data.dtos.updaterequests.UpdateRequest;
 import com.example.loanapplication.data.dtos.updateresponse.UpdateResponse;
 import com.example.loanapplication.data.models.Customer;
+import com.example.loanapplication.data.models.User;
 import com.example.loanapplication.data.repositories.CustomerRepo;
 import com.example.loanapplication.data.repositories.UserRepository;
 import com.example.loanapplication.exceptions.*;
@@ -17,17 +18,19 @@ import com.example.loanapplication.utils.Mapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import com.example.loanapplication.data.models.User;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
 @Slf4j
 @Service
 @AllArgsConstructor
 public class BorrowPadiCustomerService implements CustomerService{
 	
 	private final CustomerRepo customerRepo;
-	private final AddressService addressService;
 	private final UserRepository userRepository;
 	MailService mailService;
+	private UserProfileService userProfileService;
 	
 	public RegisterationResponse registerCustomer(RegistrationRequest registrationRequest) throws RegistrationFailedException, FieldCannotBeEmptyException, MessageFailedException {
 		validateCustomerEmailCredentials(registrationRequest);
@@ -71,16 +74,27 @@ public class BorrowPadiCustomerService implements CustomerService{
 				       .build();
 	}
 	
-	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException{
+	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException, ObjectDoesNotExistException{
 		checkIfUserExists(loanApplicationRequest);
+		checkIfUserProfileIsSetUp(loanApplicationRequest);
 		return null;
 	}
 	
-	private void checkIfUserExists(LoanApplicationRequest loanApplicationRequest) {
+	private void checkIfUserProfileIsSetUp(LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException{
+	
+	}
+	
+	private void checkIfUserExists(LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException{
 		String username = loanApplicationRequest.getUserName();
 		String userPassword = loanApplicationRequest.getPassword();
-		String userPin = loanApplicationRequest.getUserPin();
-//		userRepository.
+		Optional<User> foundUser = userRepository.findByUsernameAndPassword(username, userPassword);
+		if (foundUser.isEmpty()){
+			log.info("User does not exist");
+			throw new ObjectDoesNotExistException("""
+					Seems Like you don't have an account with us,
+					Please click the register button
+					to create an account with us""");
+		}
 	}
 	
 	public void agreeToTermsAndConditionForLoanApplication(){

@@ -14,6 +14,7 @@ public class Customer{
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private String customerId;
+	private boolean isLoggedIn;
 	@NonNull
 	@OneToOne
 	private User user;

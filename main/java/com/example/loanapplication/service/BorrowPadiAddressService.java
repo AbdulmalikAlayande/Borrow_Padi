@@ -7,6 +7,7 @@ import com.example.loanapplication.data.models.Address;
 import com.example.loanapplication.data.repositories.AddressRepo;
 import com.example.loanapplication.exceptions.FieldCannotBeEmptyException;
 import com.example.loanapplication.exceptions.ObjectDoesNotExistException;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+ @Slf4j
 @Service
 public class BorrowPadiAddressService implements AddressService{
 	
@@ -35,19 +36,13 @@ public class BorrowPadiAddressService implements AddressService{
 			throw new FieldCannotBeEmptyException("Address Fields Cannot be empty");
 		}
 	}
-	
-	@Override
-	public Optional<AddressResponse> findAddressByUserId(String userId) {
-		return Optional.empty();
-	}
-	
 	@Override
 	public Optional<AddressResponse> findAddressById(String addressId) throws ObjectDoesNotExistException{
 		ModelMapper modelMapper = new ModelMapper();
 		AddressResponse addressResponse = new AddressResponse() ;
 		Optional<Address> foundAddress = addressRepo.findById(addressId);
 		if (foundAddress.isPresent()) {
-			modelMapper.map(foundAddress, addressResponse);
+			modelMapper.map(foundAddress.get(), addressResponse);
 			return Optional.of(addressResponse);
 		}
 		throw new ObjectDoesNotExistException("Address not found");

@@ -72,8 +72,21 @@ class CustomerServiceTest {
 				.hasMessageContaining("Registration Failed");
 	}
 	
-	@Test void loanApplicationTest(){
-	
+	@Test void userHasToSetUpTheirProfileBeforeTheyAreEligiBleToApplyForLoanTest(){
+		LoanApplicationRequest applicationRequest = LoanApplicationRequest.builder()
+				                                            .loanAmount(BigDecimal.valueOf(40_000))
+				                                            .userName("Christmas")
+				                                            .loanPurpose("For feeding")
+				                                            .userPin("1968")
+				                                            .loanTenure(30)
+				                                            .repaymentPreference("CASH")
+				                                            .password("tyson@20")
+				                                            .build();
+		assertThatThrownBy(()->{
+			customerService.applyForLoan(applicationRequest);
+		}, "Profile not set up")
+				.isInstanceOf(LoanApplicationFailedException.class)
+				.hasMessageContaining("Please Set up your profile");
 	}
 	
 	@RepeatedTest(2) void userHasToRegisterBeforeTheyCanApplyForLoanTest(){
