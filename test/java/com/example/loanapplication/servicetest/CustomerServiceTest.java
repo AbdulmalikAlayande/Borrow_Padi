@@ -42,7 +42,7 @@ class CustomerServiceTest {
 				                                           .firstName("layi")
 				                                           .email("dominicrotimi@gmail.com")
 				                                           .build();
-		//		assertThrows(FieldCannotBeEmptyException.class, () -> customerService.registerCustomer(registrationRequest1));
+//				assertThrows(FieldCannotBeEmptyException.class, () -> customerService.registerCustomer(registrationRequest1));
 	}
 	
 	@Test void registerNewCustomerTest(){

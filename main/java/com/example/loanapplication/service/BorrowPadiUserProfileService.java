@@ -17,7 +17,9 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.spi.MappingContext;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 @Service
 @Slf4j
@@ -46,13 +48,19 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 		AddressRequest addressRequest = new AddressRequest();
 		try {
 			modelMapper.map(address, addressRequest);
+			System.out.println("hey youngin");
 			Address savedAddress = addressService.saveAddress(addressRequest);
-			Optional<User> foundUser = userRepository.findByUsernameAndPassword(userProfileRequest.getUsername(), userProfileRequest.getPassword());
-			foundUser.ifPresent(userProfile::setUser);
+			System.out.println("plead for death");
+			Optional<List<User>> listOfFoundUsers = userRepository.findByUsernameAndPassword(userProfileRequest.getUsername(), userProfileRequest.getPassword());
+			listOfFoundUsers.ifPresent(doThis -> listOfFoundUsers.get().forEach(x -> userProfile.setUser(listOfFoundUsers.get().get(0))));
+			System.out.println("You may not find death");
 			userProfile.setAddress(savedAddress);
 			modelMapper.addConverter(new NullValueChecker<>());
+			System.out.println("plead for your life");
 			modelMapper.map(userProfileRequest, userProfile);
+			System.out.println("hello boy boi");
 			UserProfile saveProfile = userProfileRepo.save(userProfile);
+			System.out.println("you are still not gonna live to see the next moon");
 			UserProfileResponse userProfileResponse = new UserProfileResponse();
 			userProfileResponse.setProfileSetUpState(true);
 			userProfileResponse.setMessage("Profile Set Successfully");

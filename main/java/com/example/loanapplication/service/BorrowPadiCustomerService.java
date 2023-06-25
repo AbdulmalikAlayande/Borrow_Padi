@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -87,7 +88,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 	private void checkIfUserExists(LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException{
 		String username = loanApplicationRequest.getUserName();
 		String userPassword = loanApplicationRequest.getPassword();
-		Optional<User> foundUser = userRepository.findByUsernameAndPassword(username, userPassword);
+		Optional<List<User>> foundUser = userRepository.findByUsernameAndPassword(username, userPassword);
 		if (foundUser.isEmpty()){
 			log.info("User does not exist");
 			throw new ObjectDoesNotExistException("""
@@ -106,6 +107,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 	}
 	
 	public LoanStatusViewResponse viewLoanStatus(LoanStatusViewRequest loanStatusViewRequest) throws NoSuchLoanException {
+		
 		return null;
 	}
 	

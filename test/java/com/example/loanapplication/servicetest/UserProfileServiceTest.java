@@ -50,16 +50,11 @@ class UserProfileServiceTest {
 		assertEquals("Profile Set Successfully", userProfileResponse.getMessage());
 	}
 	
-	@Test void testFieldCannotBeEmptyExceptionIsThrownWhenTheFieldsAreNull(){
+	@Test void testFieldCannotBeEmptyExceptionIsThrownWhenTheFieldsAreNullOrThereIsAnAttemptToMapANullValue(){
 		assertThrowsExactly(FieldCannotBeEmptyException.class, ()->{
 			userProfileService.saveUserProfile(buildUserProfileRequest2());
 		}, "Exception is thrown because the fields or one of the fields is empty");
 	}
-	
-	@Test void testMappingExceptionIsThrownWhenThereIsAnAttemptToMapANullValue(){
-	
-	}
-	
 	@Test void saveUserProfile_FindSavedProfileByIdTest(){
 		userProfileService.findUserById(userProfileResponse.getProfileId());
 	}
