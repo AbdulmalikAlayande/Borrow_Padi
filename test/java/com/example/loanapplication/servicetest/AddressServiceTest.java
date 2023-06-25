@@ -2,6 +2,7 @@ package com.example.loanapplication.servicetest;
 
 import com.example.loanapplication.data.dtos.requests.AddressRequest;
 import com.example.loanapplication.data.dtos.responses.AddressResponse;
+import com.example.loanapplication.data.models.Address;
 import com.example.loanapplication.exceptions.FieldCannotBeEmptyException;
 import com.example.loanapplication.service.AddressService;
 import org.junit.jupiter.api.AfterEach;
@@ -22,7 +23,7 @@ class AddressServiceTest {
 	
 	@Autowired
 	AddressService addressService;
-	AddressResponse addressResponse;
+	Address addressResponse;
 	AddressRequest addressRequest;
 	
 	@BeforeEach void startAllTestWith() {

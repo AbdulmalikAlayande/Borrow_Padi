@@ -23,15 +23,12 @@ public class BorrowPadiAddressService implements AddressService{
 	AddressRepo addressRepo;
 	
 	@Override
-	public AddressResponse saveAddress(AddressRequest addressRequest) throws FieldCannotBeEmptyException{
+	public Address saveAddress(AddressRequest addressRequest) throws FieldCannotBeEmptyException{
 		try{
 			Address address = new Address();
 			ModelMapper modelMapper = new ModelMapper();
 			modelMapper.map(addressRequest, address);
-			Address savedAddress = addressRepo.save(address);
-			AddressResponse addressResponse = new AddressResponse();
-			modelMapper.map(savedAddress, addressResponse);
-			return addressResponse;
+			return addressRepo.save(address);
 		}catch (Throwable exception){
 			throw new FieldCannotBeEmptyException("Address Fields Cannot be empty");
 		}
