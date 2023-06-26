@@ -16,12 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.spi.MappingContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 @Service
 @Slf4j
@@ -87,27 +85,33 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 	@Override
 	public Optional<UserProfileResponse> findProfileById(String userId) {
 		Optional<UserProfile> foundUser = userProfileRepo.findById(userId);
-		UserProfileResponse response = new UserProfileResponse();
-		if (foundUser.isPresent()) {
-			response.setMessage("Profile found");
-			response.setProfileSetUpState(true);
-			response.setProfileId(foundUser.get().getProfileId());
-			return Optional.of(response);
-		}
+		Optional<UserProfileResponse> response1 = buildProfileResponse(foundUser);
+		if (response1.isPresent()) return response1;
 		throw new ObjectDoesNotExistException("Object does not exist\nCaused by incorrect profile id");
 	}
 	
 	@Override
 	public Optional<UserProfileResponse> findUserProfileByUsername(String username) {
 		Optional<UserProfile> foundUser = userProfileRepo.findByUsername(username);
+		Optional<UserProfileResponse> response = buildProfileResponse(foundUser);
+		if (response.isPresent()) return response;
+		throw new ObjectDoesNotExistException("Object does not exist\nCaused by incorrect username");
+	}
+	
+	private Optional<UserProfileResponse> buildProfileResponse(Optional<UserProfile> foundUser) {
 		UserProfileResponse response = new UserProfileResponse();
 		if (foundUser.isPresent()) {
+			response.setRecord(foundUser.get().getRecord());
+			response.setUsername(foundUser.get().getUsername());
+			response.setLoanLevel(foundUser.get().getLoanLevel());
+			response.setLoanLimit(foundUser.get().getLoanLimit());
 			response.setMessage("Profile found");
 			response.setProfileSetUpState(true);
 			response.setProfileId(foundUser.get().getProfileId());
+			response.setHasPendingLoan(foundUser.get().isHasPendingLoan());
 			return Optional.of(response);
 		}
-		throw new ObjectDoesNotExistException("Object does not exist\nCaused by incorrect username");
+		return Optional.empty();
 	}
 	
 	@Override

@@ -1,9 +1,14 @@
 package com.example.loanapplication.data.dtos.responses;
 
+import com.example.loanapplication.data.models.LoanPaymentRecord;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
@@ -14,4 +19,10 @@ public class UserProfileResponse {
 	private String message;
 	private String profileId;
 	private boolean profileSetUpState;
+	private BigDecimal loanLimit;
+	private int loanLevel;
+	@Enumerated(EnumType.STRING)
+	private LoanPaymentRecord record;
+	private String username;
+	private boolean hasPendingLoan;
 }

@@ -7,9 +7,11 @@ import com.example.loanapplication.data.dtos.requests.RegistrationRequest;
 import com.example.loanapplication.data.dtos.responses.LoanApplicationResponse;
 import com.example.loanapplication.data.dtos.responses.LoanStatusViewResponse;
 import com.example.loanapplication.data.dtos.responses.RegisterationResponse;
+import com.example.loanapplication.data.dtos.responses.UserProfileResponse;
 import com.example.loanapplication.data.dtos.updaterequests.UpdateRequest;
 import com.example.loanapplication.data.dtos.updateresponse.UpdateResponse;
 import com.example.loanapplication.data.models.Customer;
+import com.example.loanapplication.data.models.LoanPaymentRecord;
 import com.example.loanapplication.data.models.User;
 import com.example.loanapplication.data.repositories.CustomerRepo;
 import com.example.loanapplication.data.repositories.UserRepository;
@@ -20,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,11 +81,32 @@ public class BorrowPadiCustomerService implements CustomerService{
 	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException, ObjectDoesNotExistException{
 		checkIfUserExists(loanApplicationRequest);
 		checkIfUserProfileIsSetUp(loanApplicationRequest);
-		return null;
+		return new LoanApplicationResponse();
 	}
 	
 	private void checkIfUserProfileIsSetUp(LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException{
+		Optional<UserProfileResponse> userFoundByUsername = userProfileService.findUserProfileByUsername(loanApplicationRequest.getUserName());
+		if(userFoundByUsername.isEmpty()){
+			log.info("User profile does not exist");
+			throw new ObjectDoesNotExistException("""
+					Seems like you haven't set up your profile
+					please set up your profile first""");
+		}
+		checkUserLoanEligibility(userFoundByUsername, loanApplicationRequest);
+	}
 	
+	private void checkUserLoanEligibility(Optional<UserProfileResponse> userFoundByUsername, LoanApplicationRequest loanApplicationRequest) {
+		int loanLevel = 0;
+		BigDecimal loanLimit = null;
+		LoanPaymentRecord record = null;
+		if (userFoundByUsername.isPresent()) {
+			loanLevel = userFoundByUsername.get().getLoanLevel();
+			loanLimit = userFoundByUsername.get().getLoanLimit();
+			record = userFoundByUsername.get().getRecord();
+		}
+		boolean isInvalidLoanLimit = loanApplicationRequest.getLoanAmount().compareTo(loanLimit) > 0;
+		boolean isBadRecord = record == LoanPaymentRecord.BAD;
+		if (isInvalidLoanLimit || isBadRecord) throw new LoanApplicationFailedException("Loan Application Request Failed::");
 	}
 	
 	private void checkIfUserExists(LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException{

@@ -28,4 +28,5 @@ public class UserProfile {
 	private String userPin;
 	@Column(unique = true)
 	private String username;
+	private boolean hasPendingLoan;
 }
