@@ -26,5 +26,6 @@ public class UserProfile {
 	@OneToOne(cascade = CascadeType.ALL)
 	private BankInfo info;
 	private String userPin;
+	@Column(unique = true)
 	private String username;
 }

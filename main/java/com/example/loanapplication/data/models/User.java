@@ -15,6 +15,7 @@ public class User {
 	@NonNull
 	private String lastName;
 	@NonNull
+	@Column(unique = true)
 	private String username;
 	@NonNull
 	private String password;

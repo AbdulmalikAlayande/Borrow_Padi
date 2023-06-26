@@ -10,11 +10,13 @@ import com.example.loanapplication.data.repositories.BankInfoRepo;
 import com.example.loanapplication.data.repositories.UserProfileRepo;
 import com.example.loanapplication.data.repositories.UserRepository;
 import com.example.loanapplication.exceptions.FieldCannotBeEmptyException;
+import com.example.loanapplication.exceptions.ObjectDoesNotExistException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.spi.MappingContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,6 +32,7 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 	UserProfileRepo userProfileRepo;
 	UserRepository userRepository;
 	AddressService addressService;
+	ModelMapper modelMapper;
 	
 	private static class NullValueChecker<DTO, Model> implements Converter<DTO, Model> {
 		@Override
@@ -43,24 +46,18 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 	@Override
 	public UserProfileResponse saveUserProfile(UserProfileRequest userProfileRequest) {
 		UserProfile userProfile = new UserProfile();
-		ModelMapper modelMapper = new ModelMapper();
 		Address address = getAddress(userProfileRequest);
+		modelMapper = new ModelMapper();
 		AddressRequest addressRequest = new AddressRequest();
 		try {
 			modelMapper.map(address, addressRequest);
-			System.out.println("hey youngin");
 			Address savedAddress = addressService.saveAddress(addressRequest);
-			System.out.println("plead for death");
 			Optional<List<User>> listOfFoundUsers = userRepository.findByUsernameAndPassword(userProfileRequest.getUsername(), userProfileRequest.getPassword());
 			listOfFoundUsers.ifPresent(doThis -> listOfFoundUsers.get().forEach(x -> userProfile.setUser(listOfFoundUsers.get().get(0))));
-			System.out.println("You may not find death");
 			userProfile.setAddress(savedAddress);
 			modelMapper.addConverter(new NullValueChecker<>());
-			System.out.println("plead for your life");
 			modelMapper.map(userProfileRequest, userProfile);
-			System.out.println("hello boy boi");
 			UserProfile saveProfile = userProfileRepo.save(userProfile);
-			System.out.println("you are still not gonna live to see the next moon");
 			UserProfileResponse userProfileResponse = new UserProfileResponse();
 			userProfileResponse.setProfileSetUpState(true);
 			userProfileResponse.setMessage("Profile Set Successfully");
@@ -81,20 +78,36 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 				       .build();
 	}
 	
+	
 	@Override
-	public Optional<UserProfileResponse> findUserProfileByUsernameAndPassword(String username, String password){
-		
+	public Optional<UserProfileResponse> findProfileByUser(User user) {
 		return Optional.empty();
 	}
 	
 	@Override
-	public Optional<UserProfileResponse> findUserById(String userId) {
-		return Optional.empty();
+	public Optional<UserProfileResponse> findProfileById(String userId) {
+		Optional<UserProfile> foundUser = userProfileRepo.findById(userId);
+		UserProfileResponse response = new UserProfileResponse();
+		if (foundUser.isPresent()) {
+			response.setMessage("Profile found");
+			response.setProfileSetUpState(true);
+			response.setProfileId(foundUser.get().getProfileId());
+			return Optional.of(response);
+		}
+		throw new ObjectDoesNotExistException("Object does not exist\nCaused by incorrect profile id");
 	}
 	
 	@Override
-	public Optional<UserProfileResponse> findUserProfileByUsernameAndPin(String username, String pin) {
-		return Optional.empty();
+	public Optional<UserProfileResponse> findUserProfileByUsername(String username) {
+		Optional<UserProfile> foundUser = userProfileRepo.findByUsername(username);
+		UserProfileResponse response = new UserProfileResponse();
+		if (foundUser.isPresent()) {
+			response.setMessage("Profile found");
+			response.setProfileSetUpState(true);
+			response.setProfileId(foundUser.get().getProfileId());
+			return Optional.of(response);
+		}
+		throw new ObjectDoesNotExistException("Object does not exist\nCaused by incorrect username");
 	}
 	
 	@Override

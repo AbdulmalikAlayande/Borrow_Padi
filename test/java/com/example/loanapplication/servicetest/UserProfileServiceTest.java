@@ -9,11 +9,13 @@ import com.example.loanapplication.service.UserProfileService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigInteger;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -56,8 +58,31 @@ class UserProfileServiceTest {
 		}, "Exception is thrown because the fields or one of the fields is empty");
 	}
 	@Test void saveUserProfile_FindSavedProfileByIdTest(){
-		userProfileService.findUserById(userProfileResponse.getProfileId());
+		Optional<UserProfileResponse> foundProfile = userProfileService.findProfileById(userProfileResponse.getProfileId());
+		foundProfile.ifPresent(profileResponse -> {
+			assertNotNull(profileResponse);
+			System.out.println("aremu");
+			assertNotNull(profileResponse.getProfileId());
+		});
 	}
+	@Disabled
+	@Test void saveUserProfile_FindSavedProfileByUsernameAndPasswordTest(){
+		Optional<UserProfileResponse> foundProfile = userProfileService.findProfileByUser(new User());
+		foundProfile.ifPresent(profileResponse -> {
+			assertNotNull(profileResponse);
+			assertNotNull(profileResponse.getProfileId());
+		});
+	}
+	@Test void saveUserProfile_FindSavedProfileByUsernameAndPinTest(){
+		Optional<UserProfileResponse> foundProfile = userProfileService.findUserProfileByUsername(userProfileRequest.getUsername());
+		foundProfile.ifPresent(profileResponse -> {
+			assertNotNull(profileResponse);
+			System.out.println("vado");
+			assertNotNull(profileResponse.getProfileId());
+		});
+	}
+	
+	
 	
 	private UserProfileRequest buildUserProfileRequest() {
 		return UserProfileRequest.builder()
