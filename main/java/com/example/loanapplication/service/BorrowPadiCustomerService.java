@@ -43,9 +43,13 @@ public class BorrowPadiCustomerService implements CustomerService{
 			User user = new User();
 			ModelMapper modelMapper = new ModelMapper();
 			customer = new Customer();
+			System.out.println("You will beg for death cabron");
 			modelMapper.map(registrationRequest, user);
+			System.out.println("You will beg me to die cabron");
 			User savedUser = userRepository.save(user);
+			System.out.println("But you will suffer a fate more worse than death");
 			modelMapper.map(savedUser, customer);
+			System.out.println("Britney you are gonna die");
 		} catch (Throwable exception) {
 			throw new FieldCannotBeEmptyException(exception.getMessage() + " Error: All fields must be filled");
 		}
@@ -99,14 +103,16 @@ public class BorrowPadiCustomerService implements CustomerService{
 		int loanLevel = 0;
 		BigDecimal loanLimit = null;
 		LoanPaymentRecord record = null;
+		boolean haspendingLoan = false;
 		if (userFoundByUsername.isPresent()) {
 			loanLevel = userFoundByUsername.get().getLoanLevel();
 			loanLimit = userFoundByUsername.get().getLoanLimit();
 			record = userFoundByUsername.get().getRecord();
+			haspendingLoan = userFoundByUsername.get().isHasPendingLoan();
 		}
 		boolean isInvalidLoanLimit = loanApplicationRequest.getLoanAmount().compareTo(loanLimit) > 0;
 		boolean isBadRecord = record == LoanPaymentRecord.BAD;
-		if (isInvalidLoanLimit || isBadRecord) throw new LoanApplicationFailedException("Loan Application Request Failed::");
+		if (isInvalidLoanLimit || isBadRecord || haspendingLoan) throw new LoanApplicationFailedException("Loan Application Request Failed::");
 	}
 	
 	private void checkIfUserExists(LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException{
