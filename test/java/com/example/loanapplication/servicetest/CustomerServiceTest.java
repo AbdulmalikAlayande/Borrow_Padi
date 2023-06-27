@@ -3,7 +3,7 @@ package com.example.loanapplication.servicetest;
 import com.example.loanapplication.data.dtos.requests.LoanApplicationRequest;
 import com.example.loanapplication.data.dtos.requests.RegistrationRequest;
 import com.example.loanapplication.data.dtos.responses.RegisterationResponse;
-import com.example.loanapplication.exceptions.LoanApplicationFailedException;
+import com.example.loanapplication.exceptions.ObjectDoesNotExistException;
 import com.example.loanapplication.exceptions.RegistrationFailedException;
 import com.example.loanapplication.service.CustomerService;
 import lombok.SneakyThrows;
@@ -53,17 +53,28 @@ class CustomerServiceTest {
 		
 	}
 	
-	@Test void testThatRegistrationFailedExceptionIsThrownWheneverErrorOccurs(){
-	
+	@Test void testThatRegistrationFailedExceptionIsThrownWheneverErrorLikeMultipleRegistrationOrInvalidCredenetialsOccurs(){
+		RegistrationRequest registrationRequest1 = RegistrationRequest.builder()
+				                                           .email("email#gmail.com")
+				                                           .firstName("Ayanniyi")
+				                                           .phoneNumber("07036174617")
+				                                           .lastName("Bola")
+				                                           .password("seriki@64")
+				                                           .username("Habeeb")
+				                                           .build();
+		assertThatThrownBy(() -> {
+			customerService.registerCustomer(registrationRequest1);
+		}).isInstanceOf(RegistrationFailedException.class);
 	}
 	
 	@Test void testThatCustomerEmailIsValidSavingCustomer(){
 		RegistrationRequest registrationRequest1 = RegistrationRequest.builder()
-				                                           .email("email#email.com")
-				                                           .firstName("Abdulmalik")
-				                                           .phoneNumber("07036174617")
+				                                           .email("email#gmail.com")
+				                                           .firstName("Angelo")
+				                                           .phoneNumber("+12345981862")
 				                                           .lastName("Wetter")
 				                                           .password("seriki@64")
+				                                           .username("Mike")
 				                                           .build();
 		assertThatThrownBy(() -> {
 			customerService.registerCustomer(registrationRequest1);
@@ -72,7 +83,7 @@ class CustomerServiceTest {
 				.hasMessageContaining("Registration Failed");
 	}
 	
-	@Test void userHasToSetUpTheirProfileBeforeTheyAreEligiBleToApplyForLoanTest(){
+	@Test void userHasToSetUpTheirProfileBeforeTheyAreEligiBleToApplyForLoanTest() throws ObjectDoesNotExistException{
 		LoanApplicationRequest applicationRequest = LoanApplicationRequest.builder()
 				                                            .loanAmount(BigDecimal.valueOf(40_000))
 				                                            .userName("Christmas")
@@ -85,14 +96,14 @@ class CustomerServiceTest {
 		assertThatThrownBy(()->{
 			customerService.applyForLoan(applicationRequest);
 		}, "Profile not set up")
-				.isInstanceOf(LoanApplicationFailedException.class)
+				.isInstanceOf(ObjectDoesNotExistException.class)
 				.hasMessageContaining("Please Set up your profile");
 	}
 	
-	@RepeatedTest(2) void userHasToRegisterBeforeTheyCanApplyForLoanTest(){
+	@RepeatedTest(2) void userHasToRegisterBeforeTheyCanApplyForLoanTest() throws ObjectDoesNotExistException{
 		LoanApplicationRequest applicationRequest = LoanApplicationRequest.builder()
 				                                            .loanAmount(BigDecimal.valueOf(40_000))
-				                                            .userName("Christmas")
+				                                            .userName("Daniel")
 				                                            .loanPurpose("For feeding")
 				                                            .userPin("1968")
 				                                            .loanTenure(30)
@@ -102,8 +113,8 @@ class CustomerServiceTest {
 		
 		assertThatThrownBy(() -> {
 			customerService.applyForLoan(applicationRequest);
-		}).isInstanceOf(LoanApplicationFailedException.class)
-				.hasMessageContaining("You don't have an account with us, please register to borrow loan");
+		}).isInstanceOf(ObjectDoesNotExistException.class)
+				.hasMessageContaining("Object does not exist\nCaused by incorrect username");
 	}
 	
 	@AfterEach
@@ -113,11 +124,12 @@ class CustomerServiceTest {
 	
 	private RegistrationRequest buildRegistrationRequest() {
 		return RegistrationRequest.builder()
-				       .phoneNumber("07036174617")
-				       .password("ayanniyi@20")
-				       .lastName("Obinali")
-				       .firstName("Goodness")
-				       .email("obinaligoodness@gmail.com")
+				       .phoneNumber("78093462890")
+				       .password("sammy#22")
+				       .lastName("Sammy")
+				       .firstName("cocolate")
+				       .username("Samuel Eniola")
+				       .email("theeniolasamuel@gmail.com")
 				       .build();
 	}
 }

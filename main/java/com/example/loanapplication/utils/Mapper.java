@@ -1,7 +1,9 @@
 package com.example.loanapplication.utils;
 
+import com.example.loanapplication.data.dtos.requests.RegistrationRequest;
 import com.example.loanapplication.data.dtos.responses.RegisterationResponse;
 import com.example.loanapplication.data.models.Customer;
+import com.example.loanapplication.data.models.User;
 
 public class Mapper {
 	
@@ -10,6 +12,17 @@ public class Mapper {
 		String lastName = customer.getUser().getLastName();
 		return RegisterationResponse.builder()
 				       .message("Congratulations "+firstName+" "+lastName+"Your registration was successful")
+				       .build();
+	}
+	
+	public static User map(RegistrationRequest registrationRequest){
+		return User.builder()
+				       .username(registrationRequest.getUsername())
+				       .password(registrationRequest.getPassword())
+				       .phoneNumber(registrationRequest.getPhoneNumber())
+				       .email(registrationRequest.getEmail())
+				       .firstName(registrationRequest.getFirstName())
+				       .lastName(registrationRequest.getLastName())
 				       .build();
 	}
 }

@@ -18,6 +18,7 @@ import com.example.loanapplication.data.repositories.UserRepository;
 import com.example.loanapplication.exceptions.*;
 import com.example.loanapplication.utils.Mapper;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -37,26 +38,31 @@ public class BorrowPadiCustomerService implements CustomerService{
 	private UserProfileService userProfileService;
 	
 	public RegisterationResponse registerCustomer(RegistrationRequest registrationRequest) throws RegistrationFailedException, FieldCannotBeEmptyException, MessageFailedException {
+		
 		validateCustomerEmailCredentials(registrationRequest);
 		Customer customer;
-		try {
-			User user = new User();
-			ModelMapper modelMapper = new ModelMapper();
-			customer = new Customer();
-			System.out.println("You will beg for death cabron");
-			modelMapper.map(registrationRequest, user);
-			System.out.println("You will beg me to die cabron");
-			User savedUser = userRepository.save(user);
-			System.out.println("But you will suffer a fate more worse than death");
-			modelMapper.map(savedUser, customer);
-			System.out.println("Britney you are gonna die");
-		} catch (Throwable exception) {
-			throw new FieldCannotBeEmptyException(exception.getMessage() + " Error: All fields must be filled");
+		if (userDoesNotExist(registrationRequest)){
+			try {
+				User user = new User();
+				ModelMapper modelMapper = new ModelMapper();
+				customer = new Customer();
+				User mappedUser = Mapper.map(registrationRequest);
+				User savedUser = userRepository.save(mappedUser);
+				modelMapper.map(savedUser, customer);
+				Customer savedCustomer = customerRepo.save(customer);
+      		    notifyCustomerThatRegistrationIsSuccessful(registrationRequest);
+				log.info("Registration for Customer {} is Successful", savedCustomer);
+				return Mapper.map(savedCustomer);
+			} catch (Throwable exception) {
+				throw new FieldCannotBeEmptyException(exception.getMessage()+"\nThe cause is: "+exception.getCause()+" Error: All fields must be filled");
+			}
 		}
-		Customer savedCustomer = customerRepo.save(customer);
-		log.info("Registration for Customer {} is Successful", savedCustomer);
-//		notifyCustomerThatRegistrationIsSuccessful(registrationRequest);
-		return Mapper.map(savedCustomer);
+		throw new RegistrationFailedException("Seems like you already have an account with us");
+	}
+	
+	private boolean userDoesNotExist(RegistrationRequest registrationRequest){
+		userRepository.findByUsernameAndPassword(registrationRequest.getUsername(), registrationRequest.getPassword());
+		return true;
 	}
 	
 	public void notifyCustomerThatRegistrationIsSuccessful(RegistrationRequest registrationRequest) throws MessageFailedException {
@@ -70,7 +76,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 			mailService.isValidEmail(registrationRequest.getEmail());
 			mailService.isValidPassword(registrationRequest.getPassword());
 		}catch (IllegalArgumentException exception){
-			throw new RegistrationFailedException("Registration Failed::\nCaused by"+exception.getMessage());
+			throw new RegistrationFailedException("Registration Failed::\nCaused by: "+exception.getCause()+"\n"+exception.getMessage());
 		}
 	}
 	
@@ -88,7 +94,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 		return new LoanApplicationResponse();
 	}
 	
-	private void checkIfUserProfileIsSetUp(LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException{
+	private void checkIfUserProfileIsSetUp(@NonNull LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException{
 		Optional<UserProfileResponse> userFoundByUsername = userProfileService.findUserProfileByUsername(loanApplicationRequest.getUserName());
 		if(userFoundByUsername.isEmpty()){
 			log.info("User profile does not exist");
@@ -99,7 +105,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 		checkUserLoanEligibility(userFoundByUsername, loanApplicationRequest);
 	}
 	
-	private void checkUserLoanEligibility(Optional<UserProfileResponse> userFoundByUsername, LoanApplicationRequest loanApplicationRequest) {
+	private void checkUserLoanEligibility(@NonNull Optional<UserProfileResponse> userFoundByUsername, LoanApplicationRequest loanApplicationRequest) {
 		int loanLevel = 0;
 		BigDecimal loanLimit = null;
 		LoanPaymentRecord record = null;
@@ -115,13 +121,13 @@ public class BorrowPadiCustomerService implements CustomerService{
 		if (isInvalidLoanLimit || isBadRecord || haspendingLoan) throw new LoanApplicationFailedException("Loan Application Request Failed::");
 	}
 	
-	private void checkIfUserExists(LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException{
+	private void checkIfUserExists(@NonNull LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException{
 		String username = loanApplicationRequest.getUserName();
 		String userPassword = loanApplicationRequest.getPassword();
 		Optional<List<User>> foundUser = userRepository.findByUsernameAndPassword(username, userPassword);
 		if (foundUser.isEmpty()){
 			log.info("User does not exist");
-			throw new ObjectDoesNotExistException("""
+			throw new LoanApplicationFailedException("""
 					Seems Like you don't have an account with us,
 					Please click the register button
 					to create an account with us""");
