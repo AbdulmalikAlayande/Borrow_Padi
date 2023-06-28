@@ -45,7 +45,7 @@ class CustomerServiceTest {
 	
 	}
 	
-	@Test void testThatRegistrationFailedExceptionIsThrownWheneverErrorLikeMultipleRegistrationOrInvalidCredenetialsOccurs(){
+	@Test void testThatRegistrationFailedExceptionIsThrownWheneverErrorLikeMultipleRegistrationOrInvalidCredentialsOccurs(){
 		RegistrationRequest registrationRequest1 = RegistrationRequest.builder()
 				                                           .email("email#gmail.com")
 				                                           .firstName("Ayanniyi")
@@ -54,9 +54,7 @@ class CustomerServiceTest {
 				                                           .password("seriki@64")
 				                                           .username("Habeeb")
 				                                           .build();
-		assertThatThrownBy(() -> {
-			customerService.registerCustomer(registrationRequest1);
-		}).isInstanceOf(RegistrationFailedException.class);
+		assertThatThrownBy(() -> customerService.registerCustomer(registrationRequest1)).isInstanceOf(RegistrationFailedException.class);
 	}
 	
 	@Test void testThatCustomerEmailIsValidSavingCustomer(){
@@ -68,14 +66,12 @@ class CustomerServiceTest {
 				                                           .password("seriki@64")
 				                                           .username("Mike")
 				                                           .build();
-		assertThatThrownBy(() -> {
-			customerService.registerCustomer(registrationRequest1);
-		})
+		assertThatThrownBy(() -> customerService.registerCustomer(registrationRequest1))
 				.isInstanceOf(RegistrationFailedException.class)
 				.hasMessageContaining("Registration Failed");
 	}
 	
-	@Test void userHasToSetUpTheirProfileBeforeTheyAreEligiBleToApplyForLoanTest() throws ObjectDoesNotExistException{
+	@Test void userHasToSetUpTheirProfileBeforeTheyAreEligibleToApplyForLoanTest() {
 		LoanApplicationRequest applicationRequest = LoanApplicationRequest.builder()
 				                                            .loanAmount(BigDecimal.valueOf(40_000))
 				                                            .userName("Christmas")
@@ -85,14 +81,12 @@ class CustomerServiceTest {
 				                                            .repaymentPreference("CASH")
 				                                            .password("tyson@20")
 				                                            .build();
-		assertThatThrownBy(()->{
-			customerService.applyForLoan(applicationRequest);
-		}, "Profile not set up")
+		assertThatThrownBy(()-> customerService.applyForLoan(applicationRequest), "Profile not set up")
 				.isInstanceOf(ObjectDoesNotExistException.class)
 				.hasMessageContaining("Please Set up your profile");
 	}
 	
-	@RepeatedTest(2) void userHasToRegisterBeforeTheyCanApplyForLoanTest() throws ObjectDoesNotExistException{
+	@RepeatedTest(2) void userHasToRegisterBeforeTheyCanApplyForLoanTest() {
 		LoanApplicationRequest applicationRequest = LoanApplicationRequest.builder()
 				                                            .loanAmount(BigDecimal.valueOf(40_000))
 				                                            .userName("Daniel")
@@ -103,26 +97,35 @@ class CustomerServiceTest {
 				                                            .password("tyson@20")
 				                                            .build();
 		
-		assertThatThrownBy(() -> {
-			customerService.applyForLoan(applicationRequest);
-		}).isInstanceOf(ObjectDoesNotExistException.class)
+		assertThatThrownBy(() -> customerService.applyForLoan(applicationRequest)).isInstanceOf(ObjectDoesNotExistException.class)
 				.hasMessageContaining("Object does not exist\nCaused by incorrect username");
 	}
 	
 	@Test void testThatObjectDoesNotExistExceptionIsThrownWhenTheObjectToBeFoundDoesNotExistInTheDatabase(){
-		assertThrows(ObjectDoesNotExistException.class, () -> customerService.findCustomerById("registerationResponse.getId()"));
+		assertThrows(ObjectDoesNotExistException.class, () -> customerService.findCustomerById("registrationResponse.getId()"));
+		assertThrows(ObjectDoesNotExistException.class, () -> customerService.findCustomerByUsernameAndPassword("registrationResponse.getId()", "hello"));
+		assertThrows(ObjectDoesNotExistException.class, () -> customerService.findCustomerByUsername("registrationResponse.getId()"));
 	}
 	
+	@SneakyThrows
 	@Test void testThatSavedCustomerCanBeFoundByTheCustomerId(){
 		Optional<FoundUserResponse> foundCustomer = customerService.findCustomerById(registerationResponse.getId());
 		foundCustomer.ifPresent(x -> assertThat(foundCustomer.get().getUserid()).isNotEmpty());
 		foundCustomer.ifPresent(x -> assertThat(foundCustomer.get().getMessage()).isEqualTo("User found"));
 	}
 	
+	@SneakyThrows
 	@Test void testThatSavedCustomerCanBeRetrievedFromTheDatabaseByTheUsername(){
 		Optional<FoundUserResponse> foundCustomer = customerService.findCustomerByUsername("Samuel Eniola");
 		foundCustomer.ifPresent(x -> assertThat(foundCustomer.get().getUserid()).isNotEmpty());
-		foundCustomer.ifPresent(x -> assertThat(foundCustomer.get().getMessage()).isEqualTo("User found"));
+		foundCustomer.ifPresent(x -> assertThat(foundCustomer.get().getMessage()).isEqualTo("User Found"));
+	}
+	
+	@SneakyThrows
+	@Test void testSavedCustomerCanBeAccessedInTheDatabaseByTheCustomersUsernameAndPassword(){
+		Optional<FoundUserResponse> foundCustomer = customerService.findCustomerByUsernameAndPassword("Samuel Eniola", "sammy#22");
+		foundCustomer.ifPresent(x -> assertThat(foundCustomer.get().getUserid()).isNotEmpty());
+		foundCustomer.ifPresent(x -> assertThat(foundCustomer.get().getMessage()).isEqualTo("User Found"));
 	}
 	
 	@AfterEach

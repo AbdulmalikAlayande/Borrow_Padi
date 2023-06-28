@@ -83,7 +83,7 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 	}
 	
 	@Override
-	public Optional<UserProfileResponse> findProfileById(String userId) {
+	public Optional<UserProfileResponse> findProfileById(String userId) throws ObjectDoesNotExistException {
 		Optional<UserProfile> foundUser = userProfileRepo.findById(userId);
 		Optional<UserProfileResponse> response1 = buildProfileResponse(foundUser);
 		if (response1.isPresent()) return response1;
@@ -91,7 +91,7 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 	}
 	
 	@Override
-	public Optional<UserProfileResponse> findUserProfileByUsername(String username) {
+	public Optional<UserProfileResponse> findUserProfileByUsername(String username) throws ObjectDoesNotExistException {
 		Optional<UserProfile> foundUser = userProfileRepo.findByUsername(username);
 		Optional<UserProfileResponse> response = buildProfileResponse(foundUser);
 		if (response.isPresent()) return response;

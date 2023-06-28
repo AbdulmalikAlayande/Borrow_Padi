@@ -40,7 +40,6 @@ public class BorrowPadiCustomerService implements CustomerService{
 		Customer customer;
 		if (userDoesNotExist(registrationRequest)){
 			try {
-				User user = new User();
 				ModelMapper modelMapper = new ModelMapper();
 				customer = new Customer();
 				User mappedUser = Mapper.map(registrationRequest);
@@ -59,8 +58,8 @@ public class BorrowPadiCustomerService implements CustomerService{
 	}
 	
 	private boolean userDoesNotExist(RegistrationRequest registrationRequest){
-		userRepository.findByUsernameAndPassword(registrationRequest.getUsername(), registrationRequest.getPassword());
-		return true;
+		Optional<List<User>> foundUser = userRepository.findByUsernameAndPassword(registrationRequest.getUsername(), registrationRequest.getPassword());
+		return !(foundUser.isPresent() && !foundUser.get().isEmpty());
 	}
 	
 	public void notifyCustomerThatRegistrationIsSuccessful(RegistrationRequest registrationRequest) throws MessageFailedException {
@@ -86,7 +85,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 				       .build();
 	}
 	
-	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException, ObjectDoesNotExistException{
+	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException, ObjectDoesNotExistException {
 		checkIfUserExists(loanApplicationRequest);
 		checkIfUserProfileIsSetUp(loanApplicationRequest);
 		return new LoanApplicationResponse();
@@ -146,7 +145,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 	}
 	
 	@Override
-	public Optional<FoundUserResponse> findCustomerById(String customerId) {
+	public Optional<FoundUserResponse> findCustomerById(String customerId) throws ObjectDoesNotExistException {
 		Optional<Customer> foundCustomer = customerRepo.findById(customerId);
 		FoundUserResponse response;
 		if (foundCustomer.isPresent()){
@@ -160,19 +159,36 @@ public class BorrowPadiCustomerService implements CustomerService{
 	}
 	
 	@Override
-	public Optional<FoundUserResponse> findCustomerByUsername(String username) {
-		
-		return Optional.empty();
+	public Optional<FoundUserResponse> findCustomerByUsername(String username) throws ObjectDoesNotExistException {
+		Optional<List<User>> foundUsers = userRepository.findByUsername(username);
+		User user;
+		if (foundUsers.isPresent()) {
+			user = foundUsers.get().get(0);
+			return Optional.of(FoundUserResponse.builder()
+					                   .message("User Found")
+					                   .userid(user.getUserId())
+					                   .build());
+		}
+		throw new ObjectDoesNotExistException("Customer not found: Probably incorrect username");
 	}
 	
 	@Override
-	public Optional<FoundUserResponse> findCustomerByUsernameAndPassword(String username, String password) {
-		return Optional.empty();
+	public Optional<FoundUserResponse> findCustomerByUsernameAndPassword(String username, String password) throws ObjectDoesNotExistException {
+		Optional<List<User>> foundUsers = userRepository.findByUsernameAndPassword(username, password);
+		User user;
+		if (foundUsers.isPresent()) {
+			user = foundUsers.get().get(0);
+			return Optional.of(FoundUserResponse.builder()
+					                   .message("User Found")
+					                   .userid(user.getUserId())
+					                   .build());
+		}
+		throw new ObjectDoesNotExistException("Customer not found: Probably incorrect username or password");
 	}
 	
 	@Override
 	public void deleteAll() {
-		userRepository.deleteAll();
 		customerRepo.deleteAll();
+		userRepository.deleteAll();
 	}
 }

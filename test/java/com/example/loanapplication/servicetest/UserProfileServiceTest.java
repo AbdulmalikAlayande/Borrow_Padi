@@ -53,10 +53,9 @@ class UserProfileServiceTest {
 	}
 	
 	@Test void testFieldCannotBeEmptyExceptionIsThrownWhenTheFieldsAreNullOrThereIsAnAttemptToMapANullValue(){
-		assertThrowsExactly(FieldCannotBeEmptyException.class, ()->{
-			userProfileService.saveUserProfile(buildUserProfileRequest2());
-		}, "Exception is thrown because the fields or one of the fields is empty");
+		assertThrowsExactly(FieldCannotBeEmptyException.class, ()-> userProfileService.saveUserProfile(buildUserProfileRequest2()), "Exception is thrown because the fields or one of the fields is empty");
 	}
+	@SneakyThrows
 	@Test void saveUserProfile_FindSavedProfileByIdTest(){
 		Optional<UserProfileResponse> foundProfile = userProfileService.findProfileById(userProfileResponse.getProfileId());
 		foundProfile.ifPresent(profileResponse -> {
@@ -73,6 +72,7 @@ class UserProfileServiceTest {
 			assertNotNull(profileResponse.getProfileId());
 		});
 	}
+	@SneakyThrows
 	@Test void saveUserProfile_FindSavedProfileByUsernameAndPinTest(){
 		Optional<UserProfileResponse> foundProfile = userProfileService.findUserProfileByUsername(userProfileRequest.getUsername());
 		foundProfile.ifPresent(profileResponse -> {

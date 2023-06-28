@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface CustomerService {
 	RegisterationResponse registerCustomer(RegistrationRequest registerationRequest) throws RegistrationFailedException, FieldCannotBeEmptyException, MessageFailedException;
-	LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException;
+	LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException, ObjectDoesNotExistException;
 	void agreeToTermsAndConditionForLoanApplication();
 	UpdateResponse updateDetails(UpdateRequest updateRequest);
 	LoanStatusViewResponse viewLoanStatus(LoanStatusViewRequest loanStatusViewRequest) throws NoSuchLoanException;
