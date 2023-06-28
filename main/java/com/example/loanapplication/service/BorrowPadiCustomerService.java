@@ -1,9 +1,6 @@
 package com.example.loanapplication.service;
 
-import com.example.loanapplication.data.dtos.requests.EmailRequest;
-import com.example.loanapplication.data.dtos.requests.LoanApplicationRequest;
-import com.example.loanapplication.data.dtos.requests.LoanStatusViewRequest;
-import com.example.loanapplication.data.dtos.requests.RegistrationRequest;
+import com.example.loanapplication.data.dtos.requests.*;
 import com.example.loanapplication.data.dtos.responses.*;
 import com.example.loanapplication.data.dtos.updaterequests.UpdateRequest;
 import com.example.loanapplication.data.dtos.updateresponse.UpdateResponse;
@@ -85,6 +82,12 @@ public class BorrowPadiCustomerService implements CustomerService{
 				       .build();
 	}
 	
+	@Override
+	public LoginResponse login(LoginRequest loginRequest) {
+		
+		return null;
+	}
+	
 	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException, ObjectDoesNotExistException {
 		checkIfUserExists(loanApplicationRequest);
 		checkIfUserProfileIsSetUp(loanApplicationRequest);
@@ -162,7 +165,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 	public Optional<FoundUserResponse> findCustomerByUsername(String username) throws ObjectDoesNotExistException {
 		Optional<List<User>> foundUsers = userRepository.findByUsername(username);
 		User user;
-		if (foundUsers.isPresent()) {
+		if (foundUsers.isPresent() && !foundUsers.get().isEmpty()) {
 			user = foundUsers.get().get(0);
 			return Optional.of(FoundUserResponse.builder()
 					                   .message("User Found")
@@ -176,7 +179,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 	public Optional<FoundUserResponse> findCustomerByUsernameAndPassword(String username, String password) throws ObjectDoesNotExistException {
 		Optional<List<User>> foundUsers = userRepository.findByUsernameAndPassword(username, password);
 		User user;
-		if (foundUsers.isPresent()) {
+		if (foundUsers.isPresent() && !foundUsers.get().isEmpty()) {
 			user = foundUsers.get().get(0);
 			return Optional.of(FoundUserResponse.builder()
 					                   .message("User Found")
