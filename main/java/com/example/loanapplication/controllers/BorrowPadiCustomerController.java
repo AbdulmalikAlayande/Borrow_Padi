@@ -34,4 +34,8 @@ public class BorrowPadiCustomerController {
 		}
 	}
 	
+	public RegisterationResponse findCustomerByUsername(String username){
+		return null;
+	}
+	
 }

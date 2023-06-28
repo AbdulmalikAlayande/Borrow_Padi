@@ -4,10 +4,7 @@ import com.example.loanapplication.data.dtos.requests.EmailRequest;
 import com.example.loanapplication.data.dtos.requests.LoanApplicationRequest;
 import com.example.loanapplication.data.dtos.requests.LoanStatusViewRequest;
 import com.example.loanapplication.data.dtos.requests.RegistrationRequest;
-import com.example.loanapplication.data.dtos.responses.LoanApplicationResponse;
-import com.example.loanapplication.data.dtos.responses.LoanStatusViewResponse;
-import com.example.loanapplication.data.dtos.responses.RegisterationResponse;
-import com.example.loanapplication.data.dtos.responses.UserProfileResponse;
+import com.example.loanapplication.data.dtos.responses.*;
 import com.example.loanapplication.data.dtos.updaterequests.UpdateRequest;
 import com.example.loanapplication.data.dtos.updateresponse.UpdateResponse;
 import com.example.loanapplication.data.models.Customer;
@@ -48,9 +45,10 @@ public class BorrowPadiCustomerService implements CustomerService{
 				customer = new Customer();
 				User mappedUser = Mapper.map(registrationRequest);
 				User savedUser = userRepository.save(mappedUser);
-				modelMapper.map(savedUser, customer);
+				Mapper.map(customer, savedUser);
+				System.out.println("The user is"+customer.getUser());
 				Customer savedCustomer = customerRepo.save(customer);
-      		    notifyCustomerThatRegistrationIsSuccessful(registrationRequest);
+//      		    notifyCustomerThatRegistrationIsSuccessful(registrationRequest);
 				log.info("Registration for Customer {} is Successful", savedCustomer);
 				return Mapper.map(savedCustomer);
 			} catch (Throwable exception) {
@@ -148,7 +146,33 @@ public class BorrowPadiCustomerService implements CustomerService{
 	}
 	
 	@Override
+	public Optional<FoundUserResponse> findCustomerById(String customerId) {
+		Optional<Customer> foundCustomer = customerRepo.findById(customerId);
+		FoundUserResponse response;
+		if (foundCustomer.isPresent()){
+			response = FoundUserResponse.builder()
+					           .userid(foundCustomer.get().getCustomerId())
+					           .message("User found")
+					           .build();
+			return Optional.of(response);
+		}
+		throw new ObjectDoesNotExistException("Object does not exist:: probably caused by incorrect id");
+	}
+	
+	@Override
+	public Optional<FoundUserResponse> findCustomerByUsername(String username) {
+		
+		return Optional.empty();
+	}
+	
+	@Override
+	public Optional<FoundUserResponse> findCustomerByUsernameAndPassword(String username, String password) {
+		return Optional.empty();
+	}
+	
+	@Override
 	public void deleteAll() {
+		userRepository.deleteAll();
 		customerRepo.deleteAll();
 	}
 }

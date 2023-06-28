@@ -5,11 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Data
 @Builder
 @AllArgsConstructor
-@Data
 @NoArgsConstructor
-public class RegisterationResponse {
+public class FoundUserResponse {
+	
 	private String message;
-	private String id;
+	private String userid;
 }

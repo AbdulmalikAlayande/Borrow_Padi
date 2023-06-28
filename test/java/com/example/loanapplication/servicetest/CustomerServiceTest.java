@@ -2,6 +2,7 @@ package com.example.loanapplication.servicetest;
 
 import com.example.loanapplication.data.dtos.requests.LoanApplicationRequest;
 import com.example.loanapplication.data.dtos.requests.RegistrationRequest;
+import com.example.loanapplication.data.dtos.responses.FoundUserResponse;
 import com.example.loanapplication.data.dtos.responses.RegisterationResponse;
 import com.example.loanapplication.exceptions.ObjectDoesNotExistException;
 import com.example.loanapplication.exceptions.RegistrationFailedException;
@@ -15,9 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 class CustomerServiceTest {
@@ -34,23 +37,12 @@ class CustomerServiceTest {
 		registerationResponse = customerService.registerCustomer(registrationRequest);
 	}
 	
-	@Test void testThatFieldCannotBeEmptyExceptionIsThrownWhenAFieldIsEmpty(){
-		RegistrationRequest registrationRequest1 = RegistrationRequest.builder()
-				                                           .phoneNumber("556789908976")
-				                                           .password("ty@20")
-				                                           .lastName("lamidi")
-				                                           .firstName("layi")
-				                                           .email("dominicrotimi@gmail.com")
-				                                           .build();
-//				assertThrows(FieldCannotBeEmptyException.class, () -> customerService.registerCustomer(registrationRequest1));
-	}
-	
 	@Test void registerNewCustomerTest(){
 		assertThat(registerationResponse).isNotNull();
 	}
 	
 	@Test void testThatCustomerReceivesAnEmailWhenRegistrationIsSuccessful(){
-		
+	
 	}
 	
 	@Test void testThatRegistrationFailedExceptionIsThrownWheneverErrorLikeMultipleRegistrationOrInvalidCredenetialsOccurs(){
@@ -117,9 +109,25 @@ class CustomerServiceTest {
 				.hasMessageContaining("Object does not exist\nCaused by incorrect username");
 	}
 	
+	@Test void testThatObjectDoesNotExistExceptionIsThrownWhenTheObjectToBeFoundDoesNotExistInTheDatabase(){
+		assertThrows(ObjectDoesNotExistException.class, () -> customerService.findCustomerById("registerationResponse.getId()"));
+	}
+	
+	@Test void testThatSavedCustomerCanBeFoundByTheCustomerId(){
+		Optional<FoundUserResponse> foundCustomer = customerService.findCustomerById(registerationResponse.getId());
+		foundCustomer.ifPresent(x -> assertThat(foundCustomer.get().getUserid()).isNotEmpty());
+		foundCustomer.ifPresent(x -> assertThat(foundCustomer.get().getMessage()).isEqualTo("User found"));
+	}
+	
+	@Test void testThatSavedCustomerCanBeRetrievedFromTheDatabaseByTheUsername(){
+		Optional<FoundUserResponse> foundCustomer = customerService.findCustomerByUsername("Samuel Eniola");
+		foundCustomer.ifPresent(x -> assertThat(foundCustomer.get().getUserid()).isNotEmpty());
+		foundCustomer.ifPresent(x -> assertThat(foundCustomer.get().getMessage()).isEqualTo("User found"));
+	}
+	
 	@AfterEach
 	void endAllTestWith() {
-		customerService.deleteAll();
+//		customerService.deleteAll();
 	}
 	
 	private RegistrationRequest buildRegistrationRequest() {

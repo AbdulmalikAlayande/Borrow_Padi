@@ -11,7 +11,8 @@ public class Mapper {
 		String firstName = customer.getUser().getFirstName();
 		String lastName = customer.getUser().getLastName();
 		return RegisterationResponse.builder()
-				       .message("Congratulations "+firstName+" "+lastName+"Your registration was successful")
+				       .message("Congratulations "+firstName+" "+lastName+" Your registration was successful")
+				       .id(customer.getCustomerId())
 				       .build();
 	}
 	
@@ -24,5 +25,9 @@ public class Mapper {
 				       .firstName(registrationRequest.getFirstName())
 				       .lastName(registrationRequest.getLastName())
 				       .build();
+	}
+	
+	public static void map(Customer customer, User user){
+		customer.setUser(user);
 	}
 }
