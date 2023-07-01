@@ -3,6 +3,7 @@ package com.example.loanapplication.data.models;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -15,6 +16,7 @@ public class Customer{
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private String customerId;
 	private boolean isLoggedIn;
+	private LocalDateTime lastTimeLoggedIn;
 	@NonNull
 	@OneToOne
 	private User user;

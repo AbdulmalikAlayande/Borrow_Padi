@@ -20,6 +20,7 @@ public class Mapper {
 		return User.builder()
 				       .username(registrationRequest.getUsername())
 				       .password(registrationRequest.getPassword())
+				       .token(AppUtils.generatedToken())
 				       .phoneNumber(registrationRequest.getPhoneNumber())
 				       .email(registrationRequest.getEmail())
 				       .firstName(registrationRequest.getFirstName())

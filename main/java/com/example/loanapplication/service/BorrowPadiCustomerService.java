@@ -18,8 +18,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @Service
@@ -35,28 +37,29 @@ public class BorrowPadiCustomerService implements CustomerService{
 		
 		validateCustomerEmailCredentials(registrationRequest);
 		Customer customer;
-		if (userDoesNotExist(registrationRequest)){
+		if (userDoesNotExistByUsernameAndPassword(registrationRequest.getUsername(), registrationRequest.getPassword())){
 			try {
 				ModelMapper modelMapper = new ModelMapper();
 				customer = new Customer();
 				User mappedUser = Mapper.map(registrationRequest);
 				User savedUser = userRepository.save(mappedUser);
 				Mapper.map(customer, savedUser);
-				System.out.println("The user is"+customer.getUser());
+				customer.setLoggedIn(true);
+				customer.setLastTimeLoggedIn(LocalDateTime.now());
 				Customer savedCustomer = customerRepo.save(customer);
-//      		    notifyCustomerThatRegistrationIsSuccessful(registrationRequest);
+//      		notifyCustomerThatRegistrationIsSuccessful(registrationRequest);
 				log.info("Registration for Customer {} is Successful", savedCustomer);
 				return Mapper.map(savedCustomer);
 			} catch (Throwable exception) {
 				throw new FieldCannotBeEmptyException(exception.getMessage()+"\nThe cause is: "+exception.getCause()+" Error: All fields must be filled");
 			}
 		}
-		throw new RegistrationFailedException("Seems like you already have an account with us");
+		else throw new RegistrationFailedException("Seems like you already have an account with us");
 	}
 	
-	private boolean userDoesNotExist(RegistrationRequest registrationRequest){
-		Optional<List<User>> foundUser = userRepository.findByUsernameAndPassword(registrationRequest.getUsername(), registrationRequest.getPassword());
-		return !(foundUser.isPresent() && !foundUser.get().isEmpty());
+	private boolean userDoesNotExistByUsernameAndPassword(String username, String password){
+		Optional<List<User>> foundUser = userRepository.findByUsernameAndPassword(username, password);
+		return foundUser.isEmpty() || foundUser.get().isEmpty();
 	}
 	
 	public void notifyCustomerThatRegistrationIsSuccessful(RegistrationRequest registrationRequest) throws MessageFailedException {
@@ -83,9 +86,44 @@ public class BorrowPadiCustomerService implements CustomerService{
 	}
 	
 	@Override
-	public LoginResponse login(LoginRequest loginRequest) {
+	public LoginResponse login(LoginRequest loginRequest) throws LoginFailedException {
+		boolean userDoesNotExist = userDoesNotExistByUsernameAndPassword(loginRequest.getUsername(), loginRequest.getPassword()) &&
+				                           userDoesNotExistByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
+		if (userDoesNotExist)
+			throw new LoginFailedException("Login Failed:: Seems like you don't have an account with us, please register");
 		
-		return null;
+		else {
+			if (loginRequest.getEmail() == null)
+				checkForIncorrectPasswordOrUsername(loginRequest.getPassword(), loginRequest.getUsername());
+			else if (loginRequest.getUsername() == null) {
+				checkForIncorrectPasswordOrEmail(loginRequest.getPassword(), loginRequest.getEmail());
+			}
+		}
+		return LoginResponse.builder()
+				       .message("Login Successful")
+				       .build();
+	}
+	
+	private boolean userDoesNotExistByEmailAndPassword(String email, String password) {
+		return !(userRepository.existsByEmailAndPassword(email, password));
+	}
+	
+	private void checkForIncorrectPasswordOrEmail(String password, String email) throws LoginFailedException {
+		AtomicBoolean isValidUser = new AtomicBoolean();
+		isValidUser.set(false);
+		Optional<List<User>> foundUser = userRepository.findAllByEmail(email);
+		foundUser.ifPresent(x-> foundUser.get().forEach(y->{
+			if (y.getPassword().equals(password))
+				isValidUser.set(true);
+		}));
+		if (!isValidUser.get())
+			throw new LoginFailedException("Invalid password");
+	}
+	
+	private void checkForIncorrectPasswordOrUsername(String password, String username) throws LoginFailedException {
+		Optional<List<User>> foundUser = userRepository.findByUsername(username);
+		if (foundUser.isPresent() && !foundUser.get().isEmpty())
+			if (!foundUser.get().get(0).getPassword().equals(password)) throw new LoginFailedException("Incorrect Password");
 	}
 	
 	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException, ObjectDoesNotExistException {
@@ -109,16 +147,16 @@ public class BorrowPadiCustomerService implements CustomerService{
 		int loanLevel = 0;
 		BigDecimal loanLimit = null;
 		LoanPaymentRecord record = null;
-		boolean haspendingLoan = false;
+		boolean hasPendingLoan = false;
 		if (userFoundByUsername.isPresent()) {
 			loanLevel = userFoundByUsername.get().getLoanLevel();
 			loanLimit = userFoundByUsername.get().getLoanLimit();
 			record = userFoundByUsername.get().getRecord();
-			haspendingLoan = userFoundByUsername.get().isHasPendingLoan();
+			hasPendingLoan = userFoundByUsername.get().isHasPendingLoan();
 		}
 		boolean isInvalidLoanLimit = loanApplicationRequest.getLoanAmount().compareTo(loanLimit) > 0;
 		boolean isBadRecord = record == LoanPaymentRecord.BAD;
-		if (isInvalidLoanLimit || isBadRecord || haspendingLoan) throw new LoanApplicationFailedException("Loan Application Request Failed::");
+		if (isInvalidLoanLimit || isBadRecord || hasPendingLoan) throw new LoanApplicationFailedException("Loan Application Request Failed::");
 	}
 	
 	private void checkIfUserExists(@NonNull LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException{

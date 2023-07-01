@@ -1,9 +1,12 @@
 package com.example.loanapplication.servicetest;
 
 import com.example.loanapplication.data.dtos.requests.LoanApplicationRequest;
+import com.example.loanapplication.data.dtos.requests.LoginRequest;
 import com.example.loanapplication.data.dtos.requests.RegistrationRequest;
 import com.example.loanapplication.data.dtos.responses.FoundUserResponse;
+import com.example.loanapplication.data.dtos.responses.LoginResponse;
 import com.example.loanapplication.data.dtos.responses.RegisterationResponse;
+import com.example.loanapplication.exceptions.LoginFailedException;
 import com.example.loanapplication.exceptions.ObjectDoesNotExistException;
 import com.example.loanapplication.exceptions.RegistrationFailedException;
 import com.example.loanapplication.service.CustomerService;
@@ -20,6 +23,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
@@ -41,8 +45,9 @@ class CustomerServiceTest {
 		assertThat(registerationResponse).isNotNull();
 	}
 	
-	@Test void testThatCustomerReceivesAnEmailWhenRegistrationIsSuccessful(){
-	
+	@Test void testThatCustomerCannotRegisterMoreThanOnceAndIfTheyDoARegistrationFailedExceptionIsThrown(){
+		assertThrows(RegistrationFailedException.class, () -> customerService.registerCustomer(buildRegistrationRequest()),
+				"Seems like you already have an account with us");
 	}
 	
 	@Test void testThatRegistrationFailedExceptionIsThrownWheneverErrorLikeMultipleRegistrationOrInvalidCredentialsOccurs(){
@@ -69,6 +74,47 @@ class CustomerServiceTest {
 		assertThatThrownBy(() -> customerService.registerCustomer(registrationRequest1))
 				.isInstanceOf(RegistrationFailedException.class)
 				.hasMessageContaining("Registration Failed");
+	}
+	
+	@Test void testThatUserHasToHaveARegisteredAccountBeforeTheyCanLogin(){
+		assertThatThrownBy(()-> customerService.login(buildLoginRequest()))
+				.isInstanceOf(LoginFailedException.class).hasMessageContaining("Login Failed");
+	}
+	
+	@Test void testThatLoginFailedExceptionIsThrownWhenUserEntersAnIncorrectPassword(){
+		assertThrows(LoginFailedException.class, ()->{
+			customerService.login(buildLoginRequest2());
+		});
+		assertThrows(LoginFailedException.class, ()->{
+			customerService.login(buildLoginRequest3());
+		});
+	}
+	
+	private LoginRequest buildLoginRequest3() {
+		return LoginRequest.builder().email("theeniolasamuel@gmail.com").password("sammy$1").build();
+	}
+	
+	@SneakyThrows
+	@Test void testThatCustomerCanLogin_WithEither_TheirEmailAndPassword_Or_UsernameAndPassword(){
+		LoginResponse response = customerService.login(LoginRequest.builder().password("sammy#22").email("theeniolasamuel@gmail.com").build());
+		assertEquals("Login Successful", response.getMessage());
+		LoginResponse response1 = customerService.login(LoginRequest.builder().username("Samuel Eniola").password("sammy#22").build());
+		assertEquals("Login Successful", response1.getMessage());
+	}
+	
+	private LoginRequest buildLoginRequest2() {
+		return LoginRequest.builder()
+				       .username("Samuel Eniola")
+				       .password("sammy$1")
+				       .build();
+	}
+	
+	private LoginRequest buildLoginRequest() {
+		return LoginRequest.builder()
+				       .email("oaalayande@gmail.com")
+				       .password("oseni@61")
+				       .username("ayantunde")
+				       .build();
 	}
 	
 	@Test void userHasToSetUpTheirProfileBeforeTheyAreEligibleToApplyForLoanTest() {

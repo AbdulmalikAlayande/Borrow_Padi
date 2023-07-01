@@ -14,6 +14,8 @@ public class User {
 	private String firstName;
 	@NonNull
 	private String lastName;
+	private String token;
+	private boolean expiredLoginSession;
 	@NonNull
 	@Column(unique = true)
 	private String username;
