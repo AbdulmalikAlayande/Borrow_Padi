@@ -11,6 +11,7 @@ import com.example.loanapplication.data.repositories.CustomerRepo;
 import com.example.loanapplication.data.repositories.UserRepository;
 import com.example.loanapplication.exceptions.*;
 import com.example.loanapplication.utils.Mapper;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +52,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 				log.info("Registration for Customer {} is Successful", savedCustomer);
 				return Mapper.map(savedCustomer);
 			} catch (Throwable exception) {
+				log.info("Exception at service level {}",exception.getMessage());
 				throw new FieldCannotBeEmptyException(exception.getMessage()+"\nThe cause is: "+exception.getCause()+" Error: All fields must be filled");
 			}
 		}
@@ -231,5 +233,16 @@ public class BorrowPadiCustomerService implements CustomerService{
 	public void deleteAll() {
 		customerRepo.deleteAll();
 		userRepository.deleteAll();
+	}
+	
+	@Override
+	public void deleteById(String id) {
+		customerRepo.deleteById(id);
+		userRepository.deleteById(id);
+	}
+	
+	@Override
+	@Transactional public void deleteByUsername(String username) {
+		userRepository.deleteByUsername(username);
 	}
 }

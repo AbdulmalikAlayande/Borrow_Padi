@@ -1,6 +1,7 @@
 package com.example.loanapplication.data.repositories;
 
 import com.example.loanapplication.data.models.User;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -14,4 +15,5 @@ public interface UserRepository extends JpaRepository<User, String> {
 	boolean existsByUsername(String username);
 	boolean existsByEmail(String email);
 	Optional<List<User>> findAllByEmail(String email);
+	@Transactional void deleteByUsername(String username);
 }

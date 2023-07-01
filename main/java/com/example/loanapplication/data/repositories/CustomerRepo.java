@@ -7,5 +7,4 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 public interface CustomerRepo extends JpaRepository<Customer, String> {
-
 }

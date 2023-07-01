@@ -5,6 +5,7 @@ import com.example.loanapplication.data.dtos.responses.*;
 import com.example.loanapplication.data.dtos.updaterequests.UpdateRequest;
 import com.example.loanapplication.data.dtos.updateresponse.UpdateResponse;
 import com.example.loanapplication.exceptions.*;
+import jakarta.transaction.Transactional;
 
 import java.util.Optional;
 
@@ -20,4 +21,8 @@ public interface CustomerService {
 	Optional<FoundUserResponse> findCustomerByUsernameAndPassword(String username, String password) throws ObjectDoesNotExistException;
 	
 	void deleteAll();
+	
+	void deleteById(String id);
+	
+	void deleteByUsername(String username);
 }

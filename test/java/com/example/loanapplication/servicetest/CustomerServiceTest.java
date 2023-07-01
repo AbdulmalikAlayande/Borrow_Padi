@@ -7,6 +7,7 @@ import com.example.loanapplication.data.dtos.responses.FoundUserResponse;
 import com.example.loanapplication.data.dtos.responses.LoginResponse;
 import com.example.loanapplication.data.dtos.responses.RegisterationResponse;
 import com.example.loanapplication.exceptions.LoginFailedException;
+import com.example.loanapplication.exceptions.MessageFailedException;
 import com.example.loanapplication.exceptions.ObjectDoesNotExistException;
 import com.example.loanapplication.exceptions.RegistrationFailedException;
 import com.example.loanapplication.service.CustomerService;
@@ -32,14 +33,33 @@ class CustomerServiceTest {
 	CustomerService customerService;
 	RegistrationRequest registrationRequest;
 	RegisterationResponse registerationResponse;
+	private int counter = 1;
 	
 	@BeforeEach
 	@SneakyThrows
 	void startAllTestWith() {
-		customerService.deleteAll();
-		registrationRequest = buildRegistrationRequest();
-		registerationResponse = customerService.registerCustomer(registrationRequest);
+	    registrationRequest = buildRegistrationRequest();
+		System.out.println("The username is: "+registrationRequest.getUsername());
+		customerService.deleteByUsername(registrationRequest.getUsername());
+		registerCustomer();
 	}
+	
+	private void registerCustomer() throws RegistrationFailedException, MessageFailedException {
+		registerationResponse = customerService.registerCustomer(registrationRequest);
+		counter++;
+	}
+	
+//	private RegistrationRequest buildRegistrationRequest2() {
+//		return RegistrationRequest.builder()
+//				       .phoneNumber("")
+//				       .password("Temmy@gold")
+//				       .lastName("Temilola")
+//				       .firstName("kudirat Alayande")
+//				       .username("owolabi")
+//				       .email("TemilolaKudirat@gmail.com")
+//				       .build();
+//	}
+	
 	
 	@Test void registerNewCustomerTest(){
 		assertThat(registerationResponse).isNotNull();
@@ -174,19 +194,18 @@ class CustomerServiceTest {
 		foundCustomer.ifPresent(x -> assertThat(foundCustomer.get().getMessage()).isEqualTo("User Found"));
 	}
 	
-	@AfterEach
-	void endAllTestWith() {
-//		customerService.deleteAll();
+	@AfterEach void endAllTestWith() {
+		customerService.deleteById(registerationResponse.getId());
 	}
 	
 	private RegistrationRequest buildRegistrationRequest() {
 		return RegistrationRequest.builder()
 				       .phoneNumber("78093462890")
-				       .password("sammy#22")
-				       .lastName("Sammy")
-				       .firstName("cocolate")
-				       .username("Samuel Eniola")
-				       .email("theeniolasamuel@gmail.com")
+				       .password("#BankyOf@TheWiiBank#")
+				       .lastName("Williams")
+				       .firstName("Bankole")
+				       .username("Banky wii")
+				       .email("bankolewilliams@outlook.com")
 				       .build();
 	}
 }
