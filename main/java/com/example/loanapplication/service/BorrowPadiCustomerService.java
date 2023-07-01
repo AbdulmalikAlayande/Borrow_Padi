@@ -33,6 +33,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 	private final UserRepository userRepository;
 	MailService mailService;
 	private UserProfileService userProfileService;
+	private LoanApplicationService applicationService;
 	
 	public RegisterationResponse registerCustomer(RegistrationRequest registrationRequest) throws RegistrationFailedException, FieldCannotBeEmptyException, MessageFailedException {
 		
@@ -131,11 +132,11 @@ public class BorrowPadiCustomerService implements CustomerService{
 	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException, ObjectDoesNotExistException {
 		checkIfUserExists(loanApplicationRequest);
 		checkIfUserProfileIsSetUp(loanApplicationRequest);
-		checkIfserIsLoggedIn(loanApplicationRequest.getUserName(), loanApplicationRequest.getPassword());
-		return new LoanApplicationResponse();
+		checkIfUserIsLoggedIn(loanApplicationRequest.getUserName(), loanApplicationRequest.getPassword());
+		return applicationService.applyForLoan(loanApplicationRequest);
 	}
 	
-	private void checkIfserIsLoggedIn(String userName, String password) throws ObjectDoesNotExistException {
+	private void checkIfUserIsLoggedIn(String userName, String password) throws ObjectDoesNotExistException {
 		Optional<FoundUserResponse> foundCustomer = findCustomerByUsername(userName);
 		foundCustomer.ifPresent(x->{
 			if (!x.isLoggedIn()) {
