@@ -131,7 +131,19 @@ public class BorrowPadiCustomerService implements CustomerService{
 	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException, ObjectDoesNotExistException {
 		checkIfUserExists(loanApplicationRequest);
 		checkIfUserProfileIsSetUp(loanApplicationRequest);
+		checkIfserIsLoggedIn(loanApplicationRequest.getUserName(), loanApplicationRequest.getPassword());
 		return new LoanApplicationResponse();
+	}
+	
+	private void checkIfserIsLoggedIn(String userName, String password) throws ObjectDoesNotExistException {
+		Optional<FoundUserResponse> foundCustomer = findCustomerByUsername(userName);
+		foundCustomer.ifPresent(x->{
+			if (!x.isLoggedIn()) {
+				LoanApplicationFailedException exception = new LoanApplicationFailedException("Loan Application Failed Exception");
+				exception.setCause("You are not logged in");
+				throw exception;
+			}
+		});
 	}
 	
 	private void checkIfUserProfileIsSetUp(@NonNull LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException{
@@ -205,10 +217,14 @@ public class BorrowPadiCustomerService implements CustomerService{
 	public Optional<FoundUserResponse> findCustomerByUsername(String username) throws ObjectDoesNotExistException {
 		Optional<List<User>> foundUsers = userRepository.findByUsername(username);
 		User user;
+		AtomicBoolean isLoggedIn = new AtomicBoolean();
 		if (foundUsers.isPresent() && !foundUsers.get().isEmpty()) {
 			user = foundUsers.get().get(0);
+			Optional<Customer> foundCustomer = customerRepo.findByUser(user);
+			foundCustomer.ifPresent(x-> isLoggedIn.set(x.isLoggedIn()));
 			return Optional.of(FoundUserResponse.builder()
 					                   .message("User Found")
+					                   .isLoggedIn(isLoggedIn.get())
 					                   .userid(user.getUserId())
 					                   .build());
 		}

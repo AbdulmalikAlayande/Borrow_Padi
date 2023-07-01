@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 public class FoundUserResponse {
 	
 	private String message;
+	private boolean isLoggedIn;
 	private String userid;
 }

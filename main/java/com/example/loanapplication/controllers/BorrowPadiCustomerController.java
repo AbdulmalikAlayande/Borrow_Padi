@@ -1,19 +1,18 @@
 package com.example.loanapplication.controllers;
 
+import com.example.loanapplication.data.dtos.requests.LoginRequest;
 import com.example.loanapplication.data.dtos.requests.RegistrationRequest;
+import com.example.loanapplication.data.dtos.responses.LoginResponse;
 import com.example.loanapplication.data.dtos.responses.RegisterationResponse;
+import com.example.loanapplication.exceptions.LoginFailedException;
 import com.example.loanapplication.exceptions.MessageFailedException;
 import com.example.loanapplication.exceptions.RegistrationFailedException;
 import com.example.loanapplication.service.CustomerService;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("my_api/v8")
@@ -36,9 +35,20 @@ public class BorrowPadiCustomerController {
 					       .build();
 		}
 	}
-	
-	public RegisterationResponse findCustomerByUsername(String username){
+	@GetMapping("/find_by_username/")
+	public RegisterationResponse findCustomerByUsername(@PathVariable String username){
 		return null;
+	}
+	@PostMapping("/login/")
+	public LoginResponse login(@RequestBody LoginRequest loginRequest){
+		try {
+			return customerService.login(loginRequest);
+		} catch (LoginFailedException e) {
+			log.info("Exception caught at controller level {}", e.getMessage());
+			return LoginResponse.builder()
+					       .message(e.getMessage())
+					       .build();
+		}
 	}
 	
 }
