@@ -169,7 +169,8 @@ public class BorrowPadiCustomerService implements CustomerService{
 			record = userFoundByUsername.get().getRecord();
 			hasPendingLoan = userFoundByUsername.get().isHasPendingLoan();
 		}
-		boolean isInvalidLoanLimit = loanApplicationRequest.getLoanAmount().compareTo(loanLimit) > 0;
+		BigDecimal loanAmount = BigDecimal.valueOf(loanApplicationRequest.getLoanAmount());
+		boolean isInvalidLoanLimit = loanAmount.compareTo(loanLimit) > 0;
 		boolean isBadRecord = record == LoanPaymentRecord.BAD;
 		if (isInvalidLoanLimit || isBadRecord || hasPendingLoan) throw new LoanApplicationFailedException("Loan Application Request Failed::");
 	}

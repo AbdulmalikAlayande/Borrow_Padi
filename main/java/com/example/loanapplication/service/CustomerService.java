@@ -1,11 +1,13 @@
 package com.example.loanapplication.service;
 
-import com.example.loanapplication.data.dtos.requests.*;
+import com.example.loanapplication.data.dtos.requests.LoanApplicationRequest;
+import com.example.loanapplication.data.dtos.requests.LoanStatusViewRequest;
+import com.example.loanapplication.data.dtos.requests.LoginRequest;
+import com.example.loanapplication.data.dtos.requests.RegistrationRequest;
 import com.example.loanapplication.data.dtos.responses.*;
 import com.example.loanapplication.data.dtos.updaterequests.UpdateRequest;
 import com.example.loanapplication.data.dtos.updateresponse.UpdateResponse;
 import com.example.loanapplication.exceptions.*;
-import jakarta.transaction.Transactional;
 
 import java.util.Optional;
 

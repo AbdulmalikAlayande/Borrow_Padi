@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,7 +32,6 @@ class CustomerServiceTest {
 	CustomerService customerService;
 	RegistrationRequest registrationRequest;
 	RegisterationResponse registerationResponse;
-	private int counter = 1;
 	
 	@BeforeEach
 	@SneakyThrows
@@ -46,7 +44,6 @@ class CustomerServiceTest {
 	
 	private void registerCustomer() throws RegistrationFailedException, MessageFailedException {
 		registerationResponse = customerService.registerCustomer(registrationRequest);
-		counter++;
 	}
 	
 //	private RegistrationRequest buildRegistrationRequest2() {
@@ -102,12 +99,8 @@ class CustomerServiceTest {
 	}
 	
 	@Test void testThatLoginFailedExceptionIsThrownWhenUserEntersAnIncorrectPassword(){
-		assertThrows(LoginFailedException.class, ()->{
-			customerService.login(buildLoginRequest2());
-		});
-		assertThrows(LoginFailedException.class, ()->{
-			customerService.login(buildLoginRequest3());
-		});
+		assertThrows(LoginFailedException.class, ()-> customerService.login(buildLoginRequest2()));
+		assertThrows(LoginFailedException.class, ()-> customerService.login(buildLoginRequest3()));
 	}
 	
 	private LoginRequest buildLoginRequest3() {
@@ -139,7 +132,7 @@ class CustomerServiceTest {
 	
 	@Test void userHasToSetUpTheirProfileBeforeTheyAreEligibleToApplyForLoanTest() {
 		LoanApplicationRequest applicationRequest = LoanApplicationRequest.builder()
-				                                            .loanAmount(BigDecimal.valueOf(40_000))
+				                                            .loanAmount(40_000)
 				                                            .userName("Christmas")
 				                                            .loanPurpose("For feeding")
 				                                            .userPin("1968")
@@ -154,7 +147,7 @@ class CustomerServiceTest {
 	
 	@RepeatedTest(2) void userHasToRegisterBeforeTheyCanApplyForLoanTest() {
 		LoanApplicationRequest applicationRequest = LoanApplicationRequest.builder()
-				                                            .loanAmount(BigDecimal.valueOf(40_000))
+				                                            .loanAmount(40_000)
 				                                            .userName("Daniel")
 				                                            .loanPurpose("For feeding")
 				                                            .userPin("1968")
