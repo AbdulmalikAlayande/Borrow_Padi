@@ -21,10 +21,11 @@ public class LoanApplicationRequest {
 	@NonNull
 	private String loanPurpose;
 	@NonNull
-	@Enumerated(EnumType.STRING)
 	private String repaymentPreference;
 	@org.springframework.lang.NonNull
 	private String password;
+	@NotEmpty
 	private String userPin;
+	@NotEmpty
 	private int loanTenure;
 }
