@@ -1,7 +1,9 @@
 package com.example.loanapplication.servicetest;
 
 import com.example.loanapplication.data.dtos.requests.LoanApplicationRequest;
+import com.example.loanapplication.data.dtos.requests.UserProfileRequest;
 import com.example.loanapplication.data.dtos.responses.LoanApplicationResponse;
+import com.example.loanapplication.data.dtos.responses.UserProfileResponse;
 import com.example.loanapplication.exceptions.LoanApplicationFailedException;
 import com.example.loanapplication.service.BorrowPadiUserProfileService;
 import com.example.loanapplication.service.CustomerService;
@@ -27,9 +29,27 @@ class LoanApplicationServiceTest {
 	BorrowPadiUserProfileService profileService;
 	@Autowired
 	CustomerService customerService;
+	UserProfileResponse profileResponse;
 	
 	@BeforeEach
 	void setUp() {
+		profileResponse = profileService.saveUserProfile(buildProfileRequest());
+	}
+	
+	private UserProfileRequest buildProfileRequest() {
+		return UserProfileRequest.builder()
+				       .streetName("Ladipo")
+				       .postCode("1212")
+				       .state("Lagos")
+				       .username("blaqmhee")
+				       .bvn("3456")
+				       .houseNumber("43B")
+				       .city("Sabo")
+				       .accountNumber("7036174617")
+				       .bankName("Palmpay")
+				       .accountName("Alayande Abdulmalik")
+				       .password("ayanniyi@20")
+				       .build();
 	}
 	
 	@AfterEach
