@@ -3,8 +3,10 @@ package com.example.loanapplication.servicetest;
 import com.example.loanapplication.data.dtos.requests.UserProfileRequest;
 import com.example.loanapplication.data.dtos.responses.UserProfileResponse;
 import com.example.loanapplication.data.models.User;
+import com.example.loanapplication.data.repositories.CustomerRepo;
 import com.example.loanapplication.data.repositories.UserRepository;
 import com.example.loanapplication.exceptions.FieldCannotBeEmptyException;
+import com.example.loanapplication.service.CustomerService;
 import com.example.loanapplication.service.UserProfileService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
@@ -28,14 +30,18 @@ class UserProfileServiceTest {
 	UserRepository userRepository;
 	UserProfileRequest userProfileRequest;
 	UserProfileResponse userProfileResponse;
+	@Autowired
+	CustomerService customerService;
 	User user;
 	@SneakyThrows
 	@BeforeEach
 	void startAllTestWith() {
-		userRepository.deleteAll();
+		userProfileRequest = buildUserProfileRequest();
+		customerService.deleteByUsername(buildUserProfileRequest().getUsername());
+		userRepository.deleteByUsername(buildUserProfileRequest().getUsername());
+		userProfileService.deleteAll();
 		buildUser();
 		userRepository.save(user);
-		userProfileRequest = buildUserProfileRequest();
 		userProfileResponse = userProfileService.saveUserProfile(userProfileRequest);
 	}
 	

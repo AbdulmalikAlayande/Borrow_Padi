@@ -159,20 +159,29 @@ public class BorrowPadiCustomerService implements CustomerService{
 	}
 	
 	private void checkUserLoanEligibility(@NonNull Optional<UserProfileResponse> userFoundByUsername, LoanApplicationRequest loanApplicationRequest) {
-		int loanLevel = 0;
-		BigDecimal loanLimit = null;
-		LoanPaymentRecord record = null;
-		boolean hasPendingLoan = false;
-		if (userFoundByUsername.isPresent()) {
-			loanLevel = userFoundByUsername.get().getLoanLevel();
-			loanLimit = userFoundByUsername.get().getLoanLimit();
-			record = userFoundByUsername.get().getRecord();
-			hasPendingLoan = userFoundByUsername.get().isHasPendingLoan();
+		try{
+			int loanLevel = 0;
+			BigDecimal loanLimit = null;
+			LoanPaymentRecord record = null;
+			boolean hasPendingLoan = false;
+			if (userFoundByUsername.isPresent()) {
+				loanLevel = userFoundByUsername.get().getLoanLevel();
+				loanLimit = userFoundByUsername.get().getLoanLimit();
+				record = userFoundByUsername.get().getRecord();
+				hasPendingLoan = userFoundByUsername.get().isHasPendingLoan();
+			}
+			BigDecimal loanAmount = BigDecimal.valueOf(loanApplicationRequest.getLoanAmount());
+			boolean isInvalidLoanLimit = loanAmount.compareTo(loanLimit) > 0;
+			boolean isBadRecord = record == LoanPaymentRecord.BAD;
+			if (isInvalidLoanLimit || isBadRecord || hasPendingLoan)
+				throw new LoanApplicationFailedException("Loan Application Request Failed::");
 		}
-		BigDecimal loanAmount = BigDecimal.valueOf(loanApplicationRequest.getLoanAmount());
-		boolean isInvalidLoanLimit = loanAmount.compareTo(loanLimit) > 0;
-		boolean isBadRecord = record == LoanPaymentRecord.BAD;
-		if (isInvalidLoanLimit || isBadRecord || hasPendingLoan) throw new LoanApplicationFailedException("Loan Application Request Failed::");
+		catch(Throwable exception){
+			LoanApplicationFailedException failedException = new LoanApplicationFailedException(exception.getMessage());
+			failedException.setCause(exception.getCause());
+			failedException.setStackTrace(exception.getStackTrace());
+			throw failedException;
+		}
 	}
 	
 	private void checkIfUserExists(@NonNull LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException{

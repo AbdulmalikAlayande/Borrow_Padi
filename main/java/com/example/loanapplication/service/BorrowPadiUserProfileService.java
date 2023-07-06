@@ -4,6 +4,7 @@ import com.example.loanapplication.data.dtos.requests.AddressRequest;
 import com.example.loanapplication.data.dtos.requests.UserProfileRequest;
 import com.example.loanapplication.data.dtos.responses.UserProfileResponse;
 import com.example.loanapplication.data.models.Address;
+import com.example.loanapplication.data.models.BankInfo;
 import com.example.loanapplication.data.models.User;
 import com.example.loanapplication.data.models.UserProfile;
 import com.example.loanapplication.data.repositories.BankInfoRepo;
@@ -11,6 +12,7 @@ import com.example.loanapplication.data.repositories.UserProfileRepo;
 import com.example.loanapplication.data.repositories.UserRepository;
 import com.example.loanapplication.exceptions.FieldCannotBeEmptyException;
 import com.example.loanapplication.exceptions.ObjectDoesNotExistException;
+import com.example.loanapplication.utils.Mapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.Converter;
@@ -18,6 +20,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.spi.MappingContext;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,30 +47,38 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 	@Override
 	public UserProfileResponse saveUserProfile(UserProfileRequest userProfileRequest) {
 		UserProfile userProfile = new UserProfile();
-		Address address = getAddress(userProfileRequest);
 		modelMapper = new ModelMapper();
-		AddressRequest addressRequest = new AddressRequest();
-		try {
-			modelMapper.map(address, addressRequest);
+//		try {
+			BankInfo bankInfo = new BankInfo();
+			BankInfo mappedBankInfo = Mapper.map(userProfileRequest);
+			BankInfo savedBankInfo = bankInfoRepo.save(bankInfo);
+			AddressRequest addressRequest = getAddress(userProfileRequest);
 			Address savedAddress = addressService.saveAddress(addressRequest);
 			Optional<List<User>> listOfFoundUsers = userRepository.findByUsernameAndPassword(userProfileRequest.getUsername(), userProfileRequest.getPassword());
 			listOfFoundUsers.ifPresent(doThis -> listOfFoundUsers.get().forEach(x -> userProfile.setUser(listOfFoundUsers.get().get(0))));
 			userProfile.setAddress(savedAddress);
+			userProfile.setInfo(savedBankInfo);
 			modelMapper.addConverter(new NullValueChecker<>());
 			modelMapper.map(userProfileRequest, userProfile);
+			setUserProfileFields(userProfile);
 			UserProfile saveProfile = userProfileRepo.save(userProfile);
 			UserProfileResponse userProfileResponse = new UserProfileResponse();
 			userProfileResponse.setProfileSetUpState(true);
 			userProfileResponse.setMessage("Profile Set Successfully");
 			modelMapper.map(saveProfile, userProfileResponse);
 			return userProfileResponse;
-		}catch (Throwable exception){
-			throw new FieldCannotBeEmptyException(exception.getMessage());
-		}
+//		}catch (Throwable exception){
+//			throw new FieldCannotBeEmptyException(exception.getMessage());
+//		}
+	}                                               
+	
+	private void setUserProfileFields(UserProfile userProfile) {
+		userProfile.setLoanLevel(BigDecimal.ONE.intValue());
+		userProfile.setLoanLimit(BigDecimal.valueOf(5000));
 	}
 	
-	private static Address getAddress(UserProfileRequest userProfileRequest) {
-		return Address.builder()
+	private static AddressRequest getAddress(UserProfileRequest userProfileRequest) {
+		return AddressRequest.builder()
 				       .houseNumber(userProfileRequest.getHouseNumber())
 				       .state(userProfileRequest.getState())
 				       .postCode(userProfileRequest.getPostCode())
@@ -126,11 +137,16 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 	
 	@Override
 	public void deleteAll() {
+		System.out.println("hello world 1");
+		System.out.println("hello world 2");
+		System.out.println("hello world 3");
 		userProfileRepo.deleteAll();
+		System.out.println("hello world 4");
 	}
 	
 	@Override
 	public void deleteUserByUsernameAndPin(String username, String pin) {
 	
 	}
+	
 }

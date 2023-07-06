@@ -17,6 +17,5 @@ public interface UserProfileService {
 	void deleteUserProfileByUserId(String userId);
 	
 	long count();
-	
 	void deleteAll();
 }

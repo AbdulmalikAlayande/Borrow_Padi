@@ -2,6 +2,7 @@ package com.example.loanapplication.utils;
 
 import com.example.loanapplication.data.dtos.requests.LoanApplicationRequest;
 import com.example.loanapplication.data.dtos.requests.RegistrationRequest;
+import com.example.loanapplication.data.dtos.requests.UserProfileRequest;
 import com.example.loanapplication.data.dtos.responses.RegisterationResponse;
 import com.example.loanapplication.data.models.*;
 
@@ -50,5 +51,14 @@ public class Mapper {
 				        .repaymentDate(repaymentDate)
 				        .requestedTermsAndCondition("")
 				        .build();
+	}
+	
+	public static BankInfo map(UserProfileRequest userProfileRequest) {
+		return BankInfo.builder()
+				       .name(userProfileRequest.getAccountName())
+				       .bvn(userProfileRequest.getBvn())
+				       .bankName(userProfileRequest.getBankName())
+				       .accountNumber(userProfileRequest.getAccountNumber())
+				       .build();
 	}
 }
