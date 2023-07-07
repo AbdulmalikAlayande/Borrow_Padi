@@ -3,7 +3,6 @@ package com.example.loanapplication.servicetest;
 import com.example.loanapplication.data.dtos.requests.UserProfileRequest;
 import com.example.loanapplication.data.dtos.responses.UserProfileResponse;
 import com.example.loanapplication.data.models.User;
-import com.example.loanapplication.data.repositories.CustomerRepo;
 import com.example.loanapplication.data.repositories.UserRepository;
 import com.example.loanapplication.exceptions.FieldCannotBeEmptyException;
 import com.example.loanapplication.service.CustomerService;
@@ -34,20 +33,15 @@ class UserProfileServiceTest {
 	CustomerService customerService;
 	User user;
 	@SneakyThrows
-	@BeforeEach
-	void startAllTestWith() {
-		userProfileRequest = buildUserProfileRequest();
-		customerService.deleteByUsername(buildUserProfileRequest().getUsername());
-		userRepository.deleteByUsername(buildUserProfileRequest().getUsername());
+	@BeforeEach void startAllTestWith() {
 		userProfileService.deleteAll();
-		buildUser();
-		userRepository.save(user);
+		userProfileRequest = buildUserProfileRequest3();
 		userProfileResponse = userProfileService.saveUserProfile(userProfileRequest);
 	}
 	
 	@AfterEach
 	void endAllTestWith() {
-		userProfileService.deleteAll();
+//		userProfileService.deleteAll();
 	}
 	
 	@Test void saveUserProfileTest(){
@@ -59,7 +53,9 @@ class UserProfileServiceTest {
 	}
 	
 	@Test void testFieldCannotBeEmptyExceptionIsThrownWhenTheFieldsAreNullOrThereIsAnAttemptToMapANullValue(){
-		assertThrowsExactly(FieldCannotBeEmptyException.class, ()-> userProfileService.saveUserProfile(buildUserProfileRequest2()), "Exception is thrown because the fields or one of the fields is empty");
+		assertThrowsExactly(FieldCannotBeEmptyException.class,
+				()-> userProfileService.saveUserProfile(buildUserProfileRequest2()),
+				"Exception is thrown because the fields or one of the fields is empty");
 	}
 	@SneakyThrows
 	@Test void saveUserProfile_FindSavedProfileByIdTest(){
@@ -101,6 +97,7 @@ class UserProfileServiceTest {
 				       .houseNumber("327")
 				       .username("Niyi")
 				       .state("Lagos")
+				       .userPin("1990")
 				       .postCode("1212")
 				       .streetName("Herbert Macaulay")
 				       .build();
@@ -122,10 +119,18 @@ class UserProfileServiceTest {
 	
 	private UserProfileRequest buildUserProfileRequest3() {
 		return UserProfileRequest.builder()
-				       .bvn("654367902")
-				       .bankName("Access Bank")
-				       .accountNumber("2022356423109")
-				       .accountName("Abela Samuel")
+				       .bvn("578930")
+				       .bankName("Palmpay")
+				       .accountNumber("202236285731")
+				       .accountName("Alayande Abdulmalik")
+				       .password("ayanniyi@20")
+				       .city("Sango")
+				       .houseNumber("327")
+				       .username("blaqmhee")
+				       .state("Osun")
+				       .userPin("1967")
+				       .postCode("204581")
+				       .streetName("Crown Estate, Edo Inside, Ajibode, Ijako Ogun State")
 				       .build();
 	}
 }

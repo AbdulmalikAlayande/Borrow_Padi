@@ -33,4 +33,6 @@ public class UserProfileRequest {
 	private String state;
 	@NotEmpty
 	private String city;
+	@NotEmpty
+	private String userPin;
 }

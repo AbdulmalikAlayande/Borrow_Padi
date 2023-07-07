@@ -6,6 +6,7 @@ import com.example.loanapplication.data.dtos.responses.LoginResponse;
 import com.example.loanapplication.data.dtos.responses.RegisterationResponse;
 import com.example.loanapplication.exceptions.LoginFailedException;
 import com.example.loanapplication.exceptions.MessageFailedException;
+import com.example.loanapplication.exceptions.ObjectDoesNotExistException;
 import com.example.loanapplication.exceptions.RegistrationFailedException;
 import com.example.loanapplication.service.CustomerService;
 import lombok.AllArgsConstructor;
@@ -28,7 +29,7 @@ public class BorrowPadiCustomerController {
 	public RegisterationResponse registerNewCustomer(@RequestBody RegistrationRequest registrationRequest){
 		try {
 			return customerService.registerCustomer(registrationRequest);
-		} catch (RegistrationFailedException | MessageFailedException e) {
+		} catch (RegistrationFailedException | MessageFailedException | ObjectDoesNotExistException e) {
 			log.info("Exception caught at controller level {}", e.getMessage());
 			return RegisterationResponse.builder()
 					       .message("Registration Failed")
@@ -43,7 +44,7 @@ public class BorrowPadiCustomerController {
 	public LoginResponse login(@RequestBody LoginRequest loginRequest){
 		try {
 			return customerService.login(loginRequest);
-		} catch (LoginFailedException e) {
+		} catch (LoginFailedException | ObjectDoesNotExistException e) {
 			log.info("Exception caught at controller level {}", e.getMessage());
 			return LoginResponse.builder()
 					       .message(e.getMessage())

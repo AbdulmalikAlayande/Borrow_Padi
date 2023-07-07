@@ -15,7 +15,6 @@ import java.time.LocalTime;
 public class LoanApplicationForm {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@NonNull
 	private Long applicationFormId;
 	private String requestedTermsAndCondition;
 	@NonNull
@@ -28,7 +27,6 @@ public class LoanApplicationForm {
 	@NonNull
 	@Enumerated(EnumType.STRING)
 	private LoanStatus status;
-	@NonNull
 	private String loanRejectionReason;
 	@NonNull
 	private LocalDate applicationDate;

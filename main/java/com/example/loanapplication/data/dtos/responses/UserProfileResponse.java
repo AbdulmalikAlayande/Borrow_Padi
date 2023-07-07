@@ -21,8 +21,8 @@ public class UserProfileResponse {
 	private boolean profileSetUpState;
 	private BigDecimal loanLimit;
 	private int loanLevel;
-	@Enumerated(EnumType.STRING)
 	private LoanPaymentRecord record;
 	private String username;
 	private boolean hasPendingLoan;
+	private String userPin;
 }

@@ -6,10 +6,7 @@ import com.example.loanapplication.data.dtos.requests.RegistrationRequest;
 import com.example.loanapplication.data.dtos.responses.FoundUserResponse;
 import com.example.loanapplication.data.dtos.responses.LoginResponse;
 import com.example.loanapplication.data.dtos.responses.RegisterationResponse;
-import com.example.loanapplication.exceptions.LoginFailedException;
-import com.example.loanapplication.exceptions.MessageFailedException;
-import com.example.loanapplication.exceptions.ObjectDoesNotExistException;
-import com.example.loanapplication.exceptions.RegistrationFailedException;
+import com.example.loanapplication.exceptions.*;
 import com.example.loanapplication.service.CustomerService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
@@ -23,8 +20,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class CustomerServiceTest {
@@ -42,21 +38,9 @@ class CustomerServiceTest {
 		registerCustomer();
 	}
 	
-	private void registerCustomer() throws RegistrationFailedException, MessageFailedException {
+	private void registerCustomer() throws RegistrationFailedException, MessageFailedException, ObjectDoesNotExistException {
 		registerationResponse = customerService.registerCustomer(registrationRequest);
 	}
-	
-//	private RegistrationRequest buildRegistrationRequest2() {
-//		return RegistrationRequest.builder()
-//				       .phoneNumber("")
-//				       .password("Temmy@gold")
-//				       .lastName("Temilola")
-//				       .firstName("kudirat Alayande")
-//				       .username("owolabi")
-//				       .email("TemilolaKudirat@gmail.com")
-//				       .build();
-//	}
-	
 	
 	@Test void registerNewCustomerTest(){
 		assertThat(registerationResponse).isNotNull();
@@ -158,6 +142,19 @@ class CustomerServiceTest {
 		
 		assertThatThrownBy(() -> customerService.applyForLoan(applicationRequest)).isInstanceOf(ObjectDoesNotExistException.class)
 				.hasMessageContaining("Object does not exist\nCaused by incorrect username");
+	}
+	
+	@Test void testThatUserPinHasToBeCorrectBeforeTheyCanApplyForLoanOrElseLoanApplicationFailedExceptionIsThrown() {
+		LoanApplicationRequest applicationRequest = LoanApplicationRequest.builder()
+				                                            .loanTenure(30)
+				                                            .userName("Niyi")
+				                                            .userPin("1960")
+				                                            .loanPurpose("for food")
+				                                            .password("ayanniyi@20")
+				                                            .repaymentPreference("cash")
+				                                            .loanAmount(3000)
+				                                            .build();
+		assertThrowsExactly(LoanApplicationFailedException.class, () -> customerService.applyForLoan(applicationRequest));
 	}
 	
 	@Test void testThatObjectDoesNotExistExceptionIsThrownWhenTheObjectToBeFoundDoesNotExistInTheDatabase(){

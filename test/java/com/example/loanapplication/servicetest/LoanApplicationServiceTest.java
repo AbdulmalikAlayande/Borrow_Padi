@@ -15,9 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.math.BigDecimal;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 @SpringBootTest
@@ -34,7 +31,7 @@ class LoanApplicationServiceTest {
 	@BeforeEach
 	void setUp() {
 		profileService.deleteAll();
-		profileResponse = profileService.saveUserProfile(buildProfileRequest());
+//		profileResponse = profileService.saveUserProfile(buildProfileRequest());
 	}
 	
 	private UserProfileRequest buildProfileRequest() {
@@ -48,6 +45,7 @@ class LoanApplicationServiceTest {
 				       .city("Sabo")
 				       .accountNumber("7036174617")
 				       .bankName("Palmpay")
+				       .userPin("1990")
 				       .accountName("Alayande Abdulmalik")
 				       .password("ayanniyi@20")
 				       .build();

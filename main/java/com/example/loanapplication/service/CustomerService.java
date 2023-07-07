@@ -9,15 +9,18 @@ import com.example.loanapplication.data.dtos.updaterequests.UpdateRequest;
 import com.example.loanapplication.data.dtos.updateresponse.UpdateResponse;
 import com.example.loanapplication.exceptions.*;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CustomerService {
-	RegisterationResponse registerCustomer(RegistrationRequest registerationRequest) throws RegistrationFailedException, FieldCannotBeEmptyException, MessageFailedException;
-	LoginResponse login(LoginRequest loginRequest) throws LoginFailedException;
+	RegisterationResponse registerCustomer(RegistrationRequest registerationRequest) throws RegistrationFailedException, FieldCannotBeEmptyException, MessageFailedException, ObjectDoesNotExistException;
+	LoginResponse login(LoginRequest loginRequest) throws LoginFailedException, ObjectDoesNotExistException;
 	LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException, ObjectDoesNotExistException;
 	void agreeToTermsAndConditionForLoanApplication();
 	UpdateResponse updateDetails(UpdateRequest updateRequest);
 	LoanStatusViewResponse viewLoanStatus(LoanStatusViewRequest loanStatusViewRequest) throws NoSuchLoanException;
+	Optional<List<LoanStatusViewResponse>> viewLoanHistory(String username, String password);
+	Optional<LoanStatusViewResponse> viewLoanLimit(String username, String password);
 	Optional<FoundUserResponse> findCustomerById(String customerId) throws ObjectDoesNotExistException;
 	Optional<FoundUserResponse> findCustomerByUsername(String username) throws ObjectDoesNotExistException;
 	Optional<FoundUserResponse> findCustomerByUsernameAndPassword(String username, String password) throws ObjectDoesNotExistException;
@@ -27,5 +30,4 @@ public interface CustomerService {
 	void deleteById(String id);
 	
 	void deleteByUsername(String username);
-//	Optional<FoundUserResponse>
 }

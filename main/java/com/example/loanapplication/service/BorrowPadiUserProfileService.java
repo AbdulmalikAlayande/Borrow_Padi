@@ -48,28 +48,33 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 	public UserProfileResponse saveUserProfile(UserProfileRequest userProfileRequest) {
 		UserProfile userProfile = new UserProfile();
 		modelMapper = new ModelMapper();
-//		try {
-			BankInfo bankInfo = new BankInfo();
+		try {
 			BankInfo mappedBankInfo = Mapper.map(userProfileRequest);
-			BankInfo savedBankInfo = bankInfoRepo.save(bankInfo);
+			BankInfo savedBankInfo = bankInfoRepo.save(mappedBankInfo);
 			AddressRequest addressRequest = getAddress(userProfileRequest);
 			Address savedAddress = addressService.saveAddress(addressRequest);
 			Optional<List<User>> listOfFoundUsers = userRepository.findByUsernameAndPassword(userProfileRequest.getUsername(), userProfileRequest.getPassword());
-			listOfFoundUsers.ifPresent(doThis -> listOfFoundUsers.get().forEach(x -> userProfile.setUser(listOfFoundUsers.get().get(0))));
+			listOfFoundUsers.ifPresent(doThis -> listOfFoundUsers.get().forEach(y-> userProfile.setUser(listOfFoundUsers.get().get(0))));
 			userProfile.setAddress(savedAddress);
 			userProfile.setInfo(savedBankInfo);
 			modelMapper.addConverter(new NullValueChecker<>());
+			System.out.println("fart");
 			modelMapper.map(userProfileRequest, userProfile);
 			setUserProfileFields(userProfile);
+			System.out.println("fart 3");
 			UserProfile saveProfile = userProfileRepo.save(userProfile);
+			System.out.println("hello world 4");
 			UserProfileResponse userProfileResponse = new UserProfileResponse();
 			userProfileResponse.setProfileSetUpState(true);
 			userProfileResponse.setMessage("Profile Set Successfully");
 			modelMapper.map(saveProfile, userProfileResponse);
 			return userProfileResponse;
-//		}catch (Throwable exception){
-//			throw new FieldCannotBeEmptyException(exception.getMessage());
-//		}
+		}catch (Throwable exception){
+			FieldCannotBeEmptyException fieldCannotBeEmptyException = new FieldCannotBeEmptyException(exception.getMessage());
+			fieldCannotBeEmptyException.setCause(exception.getCause());
+			fieldCannotBeEmptyException.printStackTrace();
+			throw fieldCannotBeEmptyException;
+		}
 	}                                               
 	
 	private void setUserProfileFields(UserProfile userProfile) {
@@ -78,13 +83,20 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 	}
 	
 	private static AddressRequest getAddress(UserProfileRequest userProfileRequest) {
-		return AddressRequest.builder()
-				       .houseNumber(userProfileRequest.getHouseNumber())
-				       .state(userProfileRequest.getState())
-				       .postCode(userProfileRequest.getPostCode())
-				       .city(userProfileRequest.getCity())
-				       .streetName(userProfileRequest.getStreetName())
-				       .build();
+		try{
+			return AddressRequest.builder()
+					       .houseNumber(userProfileRequest.getHouseNumber())
+					       .state(userProfileRequest.getState())
+					       .postCode(userProfileRequest.getPostCode())
+					       .city(userProfileRequest.getCity())
+					       .streetName(userProfileRequest.getStreetName())
+					       .build();
+		}catch(Throwable exception){
+			FieldCannotBeEmptyException failedException = new FieldCannotBeEmptyException(exception.getMessage());
+			failedException.setStackTrace(exception.getStackTrace());
+			failedException.setCause(exception.getCause());
+			throw failedException;
+		}
 	}
 	
 	
@@ -106,7 +118,7 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 		Optional<UserProfile> foundUser = userProfileRepo.findByUsername(username);
 		Optional<UserProfileResponse> response = buildProfileResponse(foundUser);
 		if (response.isPresent()) return response;
-		throw new ObjectDoesNotExistException("Object does not exist\nCaused by incorrect username or unexisting profile, Please Set up your profile");
+		throw new ObjectDoesNotExistException("Object does not exist\nCaused by incorrect username or profile that does not exist, Please Set up your profile");
 	}
 	
 	private Optional<UserProfileResponse> buildProfileResponse(Optional<UserProfile> foundUser) {
@@ -116,6 +128,7 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 			response.setUsername(foundUser.get().getUsername());
 			response.setLoanLevel(foundUser.get().getLoanLevel());
 			response.setLoanLimit(foundUser.get().getLoanLimit());
+			response.setUserPin(foundUser.get().getUserPin());
 			response.setMessage("Profile found");
 			response.setProfileSetUpState(true);
 			response.setProfileId(foundUser.get().getProfileId());
@@ -137,11 +150,7 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 	
 	@Override
 	public void deleteAll() {
-		System.out.println("hello world 1");
-		System.out.println("hello world 2");
-		System.out.println("hello world 3");
 		userProfileRepo.deleteAll();
-		System.out.println("hello world 4");
 	}
 	
 	@Override

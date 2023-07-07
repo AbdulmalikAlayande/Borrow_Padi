@@ -15,12 +15,12 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -35,13 +35,12 @@ public class BorrowPadiCustomerService implements CustomerService{
 	private UserProfileService userProfileService;
 	private LoanApplicationService applicationService;
 	
-	public RegisterationResponse registerCustomer(RegistrationRequest registrationRequest) throws RegistrationFailedException, FieldCannotBeEmptyException, MessageFailedException {
+	public RegisterationResponse registerCustomer(RegistrationRequest registrationRequest) throws RegistrationFailedException, FieldCannotBeEmptyException, ObjectDoesNotExistException {
 		
 		validateCustomerEmailCredentials(registrationRequest);
 		Customer customer;
 		if (userDoesNotExistByUsernameAndPassword(registrationRequest.getUsername(), registrationRequest.getPassword())){
 			try {
-				ModelMapper modelMapper = new ModelMapper();
 				customer = new Customer();
 				User mappedUser = Mapper.map(registrationRequest);
 				User savedUser = userRepository.save(mappedUser);
@@ -60,7 +59,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 		else throw new RegistrationFailedException("Seems like you already have an account with us");
 	}
 	
-	private boolean userDoesNotExistByUsernameAndPassword(String username, String password){
+	private boolean userDoesNotExistByUsernameAndPassword(String username, String password) throws ObjectDoesNotExistException {
 		Optional<List<User>> foundUser = userRepository.findByUsernameAndPassword(username, password);
 		return foundUser.isEmpty() || foundUser.get().isEmpty();
 	}
@@ -89,7 +88,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 	}
 	
 	@Override
-	public LoginResponse login(LoginRequest loginRequest) throws LoginFailedException {
+	public LoginResponse login(LoginRequest loginRequest) throws LoginFailedException, ObjectDoesNotExistException {
 		boolean userDoesNotExist = userDoesNotExistByUsernameAndPassword(loginRequest.getUsername(), loginRequest.getPassword()) &&
 				                           userDoesNotExistByEmailAndPassword(loginRequest.getEmail(), loginRequest.getPassword());
 		if (userDoesNotExist)
@@ -123,7 +122,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 			throw new LoginFailedException("Invalid password");
 	}
 	
-	private void checkForIncorrectPasswordOrUsername(String password, String username) throws LoginFailedException {
+	private void checkForIncorrectPasswordOrUsername(String password, String username) throws LoginFailedException, ObjectDoesNotExistException {
 		Optional<List<User>> foundUser = userRepository.findByUsername(username);
 		if (foundUser.isPresent() && !foundUser.get().isEmpty())
 			if (!foundUser.get().get(0).getPassword().equals(password)) throw new LoginFailedException("Incorrect Password");
@@ -133,7 +132,24 @@ public class BorrowPadiCustomerService implements CustomerService{
 		checkIfUserExists(loanApplicationRequest);
 		checkIfUserProfileIsSetUp(loanApplicationRequest);
 		checkIfUserIsLoggedIn(loanApplicationRequest.getUserName(), loanApplicationRequest.getPassword());
+		validateUserPin(loanApplicationRequest);
 		return applicationService.applyForLoan(loanApplicationRequest);
+	}
+	
+	private void validateUserPin(LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException {
+		Optional<UserProfileResponse> foundProfile = userProfileService.findUserProfileByUsername(loanApplicationRequest.getUserName());
+		foundProfile.ifPresent((x)->{
+			if (!Objects.equals(x.getUserPin(), loanApplicationRequest.getUserPin())) {
+				LoanApplicationFailedException failedException = new LoanApplicationFailedException("Loan Application Failed");
+				failedException.setCause("Incorrect Pin");
+				StackTraceElement[] stackTraceElements = new StackTraceElement[]{
+						new StackTraceElement("BorrowPadiCustomerService", "applyForLoan()", "BorrowPadiCustomerService.java", 135),
+						new StackTraceElement("BorrowPadiCustomerService", "validateUserPin", "BorrowPadiCustomerService.java", 140),
+				};
+				failedException.setStackTrace(stackTraceElements);
+				throw failedException;
+		}
+		});
 	}
 	
 	private void checkIfUserIsLoggedIn(String userName, String password) throws ObjectDoesNotExistException {
@@ -160,12 +176,10 @@ public class BorrowPadiCustomerService implements CustomerService{
 	
 	private void checkUserLoanEligibility(@NonNull Optional<UserProfileResponse> userFoundByUsername, LoanApplicationRequest loanApplicationRequest) {
 		try{
-			int loanLevel = 0;
 			BigDecimal loanLimit = null;
 			LoanPaymentRecord record = null;
 			boolean hasPendingLoan = false;
 			if (userFoundByUsername.isPresent()) {
-				loanLevel = userFoundByUsername.get().getLoanLevel();
 				loanLimit = userFoundByUsername.get().getLoanLimit();
 				record = userFoundByUsername.get().getRecord();
 				hasPendingLoan = userFoundByUsername.get().isHasPendingLoan();
@@ -184,7 +198,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 		}
 	}
 	
-	private void checkIfUserExists(@NonNull LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException{
+	private void checkIfUserExists(@NonNull LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException, ObjectDoesNotExistException {
 		String username = loanApplicationRequest.getUserName();
 		String userPassword = loanApplicationRequest.getPassword();
 		Optional<List<User>> foundUser = userRepository.findByUsernameAndPassword(username, userPassword);
@@ -207,7 +221,17 @@ public class BorrowPadiCustomerService implements CustomerService{
 	
 	public LoanStatusViewResponse viewLoanStatus(LoanStatusViewRequest loanStatusViewRequest) throws NoSuchLoanException {
 		
-		return null;
+		return applicationService.viewLoanStatus(loanStatusViewRequest);
+	}
+	
+	@Override
+	public Optional<List<LoanStatusViewResponse>> viewLoanHistory(String username, String password) {
+		return applicationService.getAllLoans(username, password);
+	}
+	
+	@Override
+	public Optional<LoanStatusViewResponse> viewLoanLimit(String username, String password) {
+		return Optional.empty();
 	}
 	
 	@Override

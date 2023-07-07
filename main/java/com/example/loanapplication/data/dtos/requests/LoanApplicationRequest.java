@@ -9,17 +9,11 @@ import lombok.*;
 @NoArgsConstructor
 public class LoanApplicationRequest {
 	
-	@NotEmpty
 	private String userName;
 	private double loanAmount;
-	@NonNull
 	private String loanPurpose;
-	@NonNull
 	private String repaymentPreference;
-	@org.springframework.lang.NonNull
 	private String password;
-	@NotEmpty
 	private String userPin;
-	@NotEmpty
 	private int loanTenure;
 }

@@ -41,7 +41,7 @@ public class Mapper {
 		long loanTenure = loanApplicationRequest.getLoanTenure();
 		LocalDate currentDate = LocalDate.now();
 		LocalDate repaymentDate = currentDate.plusDays(loanTenure);
-		 return LoanApplicationForm.builder()
+		return LoanApplicationForm.builder()
 				        .applicationDate(LocalDate.now())
 				        .applicationTime(LocalTime.now())
 				        .loanPurpose(loanApplicationRequest.getLoanPurpose())
@@ -49,7 +49,7 @@ public class Mapper {
 				        .status(LoanStatus.PENDING)
 				        .repaymentPreference(PaymentMethod.valueOf(loanApplicationRequest.getRepaymentPreference()))
 				        .repaymentDate(repaymentDate)
-				        .requestedTermsAndCondition("")
+				        .requestedTermsAndCondition("You have to payback on the due date")
 				        .build();
 	}
 	
