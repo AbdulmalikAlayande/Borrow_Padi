@@ -5,6 +5,7 @@ import com.example.loanapplication.data.dtos.requests.UserProfileRequest;
 import com.example.loanapplication.data.dtos.responses.LoanApplicationResponse;
 import com.example.loanapplication.data.dtos.responses.UserProfileResponse;
 import com.example.loanapplication.exceptions.LoanApplicationFailedException;
+import com.example.loanapplication.exceptions.ObjectDoesNotExistException;
 import com.example.loanapplication.service.BorrowPadiUserProfileService;
 import com.example.loanapplication.service.CustomerService;
 import com.example.loanapplication.service.LoanApplicationService;
@@ -30,8 +31,7 @@ class LoanApplicationServiceTest {
 	
 	@BeforeEach
 	void setUp() {
-		profileService.deleteAll();
-//		profileResponse = profileService.saveUserProfile(buildProfileRequest());
+	
 	}
 	
 	private UserProfileRequest buildProfileRequest() {
@@ -53,6 +53,7 @@ class LoanApplicationServiceTest {
 	
 	@AfterEach
 	void tearDown() {
+	
 	}
 	
 /*

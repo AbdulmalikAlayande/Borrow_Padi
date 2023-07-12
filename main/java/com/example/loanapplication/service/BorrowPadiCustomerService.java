@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -29,6 +28,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @AllArgsConstructor
 public class BorrowPadiCustomerService implements CustomerService{
 	
+	public static final String USER_PROFILE_ERROR_MESSAGE = """
+			Seems like you haven't set up your profile
+			please set up your profile first""";
 	private final CustomerRepo customerRepo;
 	private final UserRepository userRepository;
 	MailService mailService;
@@ -45,10 +47,8 @@ public class BorrowPadiCustomerService implements CustomerService{
 				User mappedUser = Mapper.map(registrationRequest);
 				User savedUser = userRepository.save(mappedUser);
 				Mapper.map(customer, savedUser);
-				customer.setLoggedIn(true);
-				customer.setLastTimeLoggedIn(LocalDateTime.now());
 				Customer savedCustomer = customerRepo.save(customer);
-//      		notifyCustomerThatRegistrationIsSuccessful(registrationRequest);
+//      		    notifyCustomerThatRegistrationIsSuccessful(registrationRequest);
 				log.info("Registration for Customer {} is Successful", savedCustomer);
 				return Mapper.map(savedCustomer);
 			} catch (Throwable exception) {
@@ -131,7 +131,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException, ObjectDoesNotExistException {
 		checkIfUserExists(loanApplicationRequest);
 		checkIfUserProfileIsSetUp(loanApplicationRequest);
-		checkIfUserIsLoggedIn(loanApplicationRequest.getUserName(), loanApplicationRequest.getPassword());
+		checkIfUserIsLoggedIn(loanApplicationRequest.getUserName());
 		validateUserPin(loanApplicationRequest);
 		return applicationService.applyForLoan(loanApplicationRequest);
 	}
@@ -143,7 +143,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 				LoanApplicationFailedException failedException = new LoanApplicationFailedException("Loan Application Failed");
 				failedException.setCause("Incorrect Pin");
 				StackTraceElement[] stackTraceElements = new StackTraceElement[]{
-						new StackTraceElement("BorrowPadiCustomerService", "applyForLoan()", "BorrowPadiCustomerService.java", 135),
+						new StackTraceElement("BorrowPadiCustomerService", "applyForLoan", "BorrowPadiCustomerService.java", 135),
 						new StackTraceElement("BorrowPadiCustomerService", "validateUserPin", "BorrowPadiCustomerService.java", 140),
 				};
 				failedException.setStackTrace(stackTraceElements);
@@ -152,7 +152,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 		});
 	}
 	
-	private void checkIfUserIsLoggedIn(String userName, String password) throws ObjectDoesNotExistException {
+	private void checkIfUserIsLoggedIn(String userName) throws ObjectDoesNotExistException {
 		Optional<FoundUserResponse> foundCustomer = findCustomerByUsername(userName);
 		foundCustomer.ifPresent(x->{
 			if (!x.isLoggedIn()) {
@@ -164,14 +164,21 @@ public class BorrowPadiCustomerService implements CustomerService{
 	}
 	
 	private void checkIfUserProfileIsSetUp(@NonNull LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException{
-		Optional<UserProfileResponse> userFoundByUsername = userProfileService.findUserProfileByUsername(loanApplicationRequest.getUserName());
-		if(userFoundByUsername.isEmpty()){
-			log.info("User profile does not exist");
-			throw new ObjectDoesNotExistException("""
-					Seems like you haven't set up your profile
-					please set up your profile first""");
+		try{
+			log.info("I am here {}", "cabron");
+			Optional<UserProfileResponse> userFoundByUsername = userProfileService.findUserProfileByUsername(loanApplicationRequest.getUserName());
+			log.info("I am here immediately before the if statement{}", "cabron");
+			if (userFoundByUsername.isPresent()) {
+				log.info("I am here in the if statement {}", "cabron");
+				checkUserLoanEligibility(userFoundByUsername, loanApplicationRequest);
+			}
+		}catch(ObjectDoesNotExistException e){
+			ObjectDoesNotExistException exception = new ObjectDoesNotExistException(USER_PROFILE_ERROR_MESSAGE);
+			exception.setStackTrace(e.getStackTrace());
+			exception.setExceptionCause("You don't have an existing profile");
+			exception.setCause(e.getCause());
+			throw exception;
 		}
-		checkUserLoanEligibility(userFoundByUsername, loanApplicationRequest);
 	}
 	
 	private void checkUserLoanEligibility(@NonNull Optional<UserProfileResponse> userFoundByUsername, LoanApplicationRequest loanApplicationRequest) {

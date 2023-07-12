@@ -58,12 +58,9 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 			userProfile.setAddress(savedAddress);
 			userProfile.setInfo(savedBankInfo);
 			modelMapper.addConverter(new NullValueChecker<>());
-			System.out.println("fart");
 			modelMapper.map(userProfileRequest, userProfile);
 			setUserProfileFields(userProfile);
-			System.out.println("fart 3");
 			UserProfile saveProfile = userProfileRepo.save(userProfile);
-			System.out.println("hello world 4");
 			UserProfileResponse userProfileResponse = new UserProfileResponse();
 			userProfileResponse.setProfileSetUpState(true);
 			userProfileResponse.setMessage("Profile Set Successfully");
@@ -72,7 +69,6 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 		}catch (Throwable exception){
 			FieldCannotBeEmptyException fieldCannotBeEmptyException = new FieldCannotBeEmptyException(exception.getMessage());
 			fieldCannotBeEmptyException.setCause(exception.getCause());
-			fieldCannotBeEmptyException.printStackTrace();
 			throw fieldCannotBeEmptyException;
 		}
 	}                                               
@@ -116,6 +112,7 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 	@Override
 	public Optional<UserProfileResponse> findUserProfileByUsername(String username) throws ObjectDoesNotExistException {
 		Optional<UserProfile> foundUser = userProfileRepo.findByUsername(username);
+		System.out.println("all users are: "+userProfileRepo.findAll());
 		Optional<UserProfileResponse> response = buildProfileResponse(foundUser);
 		if (response.isPresent()) return response;
 		throw new ObjectDoesNotExistException("Object does not exist\nCaused by incorrect username or profile that does not exist, Please Set up your profile");

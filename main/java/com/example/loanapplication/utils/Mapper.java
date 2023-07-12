@@ -8,6 +8,7 @@ import com.example.loanapplication.data.models.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class Mapper {
@@ -35,6 +36,8 @@ public class Mapper {
 	
 	public static void map(Customer customer, User user){
 		customer.setUser(user);
+		customer.setLoggedIn(true);
+		customer.setLastTimeLoggedIn(LocalDateTime.now());
 	}
 	
 	public static LoanApplicationForm map(LoanApplicationRequest loanApplicationRequest) {

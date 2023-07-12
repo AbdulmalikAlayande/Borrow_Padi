@@ -66,10 +66,12 @@ class UserProfileServiceTest {
 			assertNotNull(profileResponse.getProfileId());
 		});
 	}
-	@Disabled
+	
+//	@Disabled
 	@Test void saveUserProfile_FindSavedProfileByUsernameAndPasswordTest(){
 		Optional<UserProfileResponse> foundProfile = userProfileService.findProfileByUser(new User());
 		foundProfile.ifPresent(profileResponse -> {
+			System.out.println(profileResponse.getProfileId());
 			assertNotNull(profileResponse);
 			assertNotNull(profileResponse.getProfileId());
 		});
