@@ -1,12 +1,8 @@
 package com.example.loanapplication.servicetest;
 
 import com.example.loanapplication.data.dtos.requests.LoanApplicationRequest;
-import com.example.loanapplication.data.dtos.requests.UserProfileRequest;
 import com.example.loanapplication.data.dtos.responses.LoanApplicationResponse;
-import com.example.loanapplication.data.dtos.responses.UserProfileResponse;
 import com.example.loanapplication.exceptions.LoanApplicationFailedException;
-import com.example.loanapplication.exceptions.ObjectDoesNotExistException;
-import com.example.loanapplication.service.BorrowPadiUserProfileService;
 import com.example.loanapplication.service.CustomerService;
 import com.example.loanapplication.service.LoanApplicationService;
 import lombok.SneakyThrows;
@@ -16,6 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.math.BigDecimal;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 @SpringBootTest
@@ -24,45 +23,21 @@ class LoanApplicationServiceTest {
 	@Autowired
 	LoanApplicationService loanApplicationService;
 	@Autowired
-	BorrowPadiUserProfileService profileService;
-	@Autowired
 	CustomerService customerService;
-	UserProfileResponse profileResponse;
 	
 	@BeforeEach
 	void setUp() {
-	
-	}
-	
-	private UserProfileRequest buildProfileRequest() {
-		return UserProfileRequest.builder()
-				       .streetName("Ladipo")
-				       .postCode("1212")
-				       .state("Lagos")
-				       .username("blaqmhee")
-				       .bvn("3456")
-				       .houseNumber("43B")
-				       .city("Sabo")
-				       .accountNumber("7036174617")
-				       .bankName("Palmpay")
-				       .userPin("1990")
-				       .accountName("Alayande Abdulmalik")
-				       .password("ayanniyi@20")
-				       .build();
 	}
 	
 	@AfterEach
 	void tearDown() {
-	
 	}
 	
-/*
 	@Test
 	void userHasToHaveAGoodLoanRecordOrBeANewUserBeforeTheyCanApplyForLoan(){
 		assertThatThrownBy(()-> customerService.applyForLoan(buildLoanApplicationRequest())).isInstanceOf(LoanApplicationFailedException.class)
 				.hasMessageContaining("You are not eligible for this loan, you don't have a good record please contact our customer care");
 	}
-*/
 	
 	@Test void userHasToFillAllNecessaryInformationBeforeTheyAreEligibleToGetLoanAndIfNotLoanApplicationFailedExceptionIsThrown(){
 		assertThrowsExactly(LoanApplicationFailedException.class, ()-> customerService.applyForLoan(LoanApplicationRequest.builder()
@@ -77,7 +52,7 @@ class LoanApplicationServiceTest {
 		assertThrowsExactly(LoanApplicationFailedException.class, ()-> customerService.applyForLoan(LoanApplicationRequest.builder()
 				                                    .password("ayanniyi@20")
 				                                    .loanTenure(30)
-				                                    .loanAmount(5000)
+				                                    .loanAmount(BigDecimal.valueOf(5000))
 				                                    .loanPurpose("for feeding")
 				                                    .userPin("3456")
 				                                    .userName("blaqmhee")
@@ -95,7 +70,7 @@ class LoanApplicationServiceTest {
 		return LoanApplicationRequest.builder()
 				       .password("ayanniyi@20")
 				       .loanTenure(30)
-				       .loanAmount(5000)
+				       .loanAmount(BigDecimal.valueOf(5000))
 				       .loanPurpose("for feeding")
 				       .userPin("2339")
 				       .userName("blaqmhee")
