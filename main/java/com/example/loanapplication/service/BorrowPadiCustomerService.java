@@ -14,7 +14,9 @@ import com.example.loanapplication.utils.Mapper;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,16 +27,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+//@AllArgsConstructor
+//@RequiredArgsConstructor
 public class BorrowPadiCustomerService implements CustomerService{
 	
 	public static final String USER_PROFILE_ERROR_MESSAGE = """
 			Seems like you haven't set up your profile
 			please set up your profile first""";
-	private final CustomerRepo customerRepo;
-	private final UserRepository userRepository;
+	@Autowired
+	private CustomerRepo customerRepo;
+	@Autowired
+	private UserRepository userRepository;
+	@Autowired
 	MailService mailService;
+	@Autowired
 	private UserProfileService userProfileService;
+	@Autowired
 	private LoanApplicationService applicationService;
 	
 	public RegisterationResponse registerCustomer(RegistrationRequest registrationRequest) throws RegistrationFailedException, FieldCannotBeEmptyException, ObjectDoesNotExistException {

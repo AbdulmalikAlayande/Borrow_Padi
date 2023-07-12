@@ -19,7 +19,7 @@ public class UserProfile {
 	private BigDecimal loanLimit;
 	private int loanLevel;
 	@Enumerated(EnumType.STRING)
-	private LoanPaymentRecord record;
+	private LoanPaymentRecord loanRepaymentRecord;
 	@OneToOne
 	private Address address;
 	@OneToOne

@@ -3,10 +3,7 @@ package com.example.loanapplication.service;
 import com.example.loanapplication.data.dtos.requests.AddressRequest;
 import com.example.loanapplication.data.dtos.requests.UserProfileRequest;
 import com.example.loanapplication.data.dtos.responses.UserProfileResponse;
-import com.example.loanapplication.data.models.Address;
-import com.example.loanapplication.data.models.BankInfo;
-import com.example.loanapplication.data.models.User;
-import com.example.loanapplication.data.models.UserProfile;
+import com.example.loanapplication.data.models.*;
 import com.example.loanapplication.data.repositories.BankInfoRepo;
 import com.example.loanapplication.data.repositories.UserProfileRepo;
 import com.example.loanapplication.data.repositories.UserRepository;
@@ -18,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.spi.MappingContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -26,12 +24,15 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-@AllArgsConstructor
 public class BorrowPadiUserProfileService implements UserProfileService{
 	
+	@Autowired
 	BankInfoRepo bankInfoRepo;
+	@Autowired
 	UserProfileRepo userProfileRepo;
+	@Autowired
 	UserRepository userRepository;
+	@Autowired
 	AddressService addressService;
 	ModelMapper modelMapper;
 	
@@ -76,6 +77,7 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 	private void setUserProfileFields(UserProfile userProfile) {
 		userProfile.setLoanLevel(BigDecimal.ONE.intValue());
 		userProfile.setLoanLimit(BigDecimal.valueOf(5000));
+		userProfile.setLoanRepaymentRecord(LoanPaymentRecord.NEUTRAL);
 	}
 	
 	private static AddressRequest getAddress(UserProfileRequest userProfileRequest) {
@@ -120,7 +122,7 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 	private Optional<UserProfileResponse> buildProfileResponse(Optional<UserProfile> foundUser) {
 		UserProfileResponse response = new UserProfileResponse();
 		if (foundUser.isPresent()) {
-			response.setRecord(foundUser.get().getRecord());
+			response.setRecord(foundUser.get().getLoanRepaymentRecord());
 			response.setUsername(foundUser.get().getUsername());
 			response.setLoanLevel(foundUser.get().getLoanLevel());
 			response.setLoanLimit(foundUser.get().getLoanLimit());
