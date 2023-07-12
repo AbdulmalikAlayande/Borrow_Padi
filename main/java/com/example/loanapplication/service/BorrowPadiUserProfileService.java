@@ -112,7 +112,6 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 	@Override
 	public Optional<UserProfileResponse> findUserProfileByUsername(String username) throws ObjectDoesNotExistException {
 		Optional<UserProfile> foundUser = userProfileRepo.findByUsername(username);
-		System.out.println("all users are: "+userProfileRepo.findAll());
 		Optional<UserProfileResponse> response = buildProfileResponse(foundUser);
 		if (response.isPresent()) return response;
 		throw new ObjectDoesNotExistException("Object does not exist\nCaused by incorrect username or profile that does not exist, Please Set up your profile");

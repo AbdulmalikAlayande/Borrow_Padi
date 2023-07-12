@@ -142,6 +142,8 @@ public class BorrowPadiCustomerService implements CustomerService{
 			if (!Objects.equals(x.getUserPin(), loanApplicationRequest.getUserPin())) {
 				LoanApplicationFailedException failedException = new LoanApplicationFailedException("Loan Application Failed");
 				failedException.setCause("Incorrect Pin");
+				Throwable throwable = new Throwable(failedException.getCause());
+				failedException.setCause(throwable.getCause());
 				StackTraceElement[] stackTraceElements = new StackTraceElement[]{
 						new StackTraceElement("BorrowPadiCustomerService", "applyForLoan", "BorrowPadiCustomerService.java", 135),
 						new StackTraceElement("BorrowPadiCustomerService", "validateUserPin", "BorrowPadiCustomerService.java", 140),
@@ -165,11 +167,8 @@ public class BorrowPadiCustomerService implements CustomerService{
 	
 	private void checkIfUserProfileIsSetUp(@NonNull LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException{
 		try{
-			log.info("I am here {}", "cabron");
 			Optional<UserProfileResponse> userFoundByUsername = userProfileService.findUserProfileByUsername(loanApplicationRequest.getUserName());
-			log.info("I am here immediately before the if statement{}", "cabron");
 			if (userFoundByUsername.isPresent()) {
-				log.info("I am here in the if statement {}", "cabron");
 				checkUserLoanEligibility(userFoundByUsername, loanApplicationRequest);
 			}
 		}catch(ObjectDoesNotExistException e){
