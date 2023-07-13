@@ -109,14 +109,38 @@ class LoanApplicationServiceTest {
 	}
 	
 	private LoanApplicationRequest buildLoanApplicationRequest() {
-		return LoanApplicationRequest.builder()
-				       .password("ayanniyi@20")
-				       .loanTenure(30)
-				       .loanAmount(5000)
-				       .loanPurpose("for feeding")
-				       .userPin("1967")
-				       .userName("blaqmhee")
-				       .repaymentPreference("CARD")
-				       .build();
+		return LoanApplicationRequest.builder().password("ayanniyi@20").loanTenure(30).loanAmount(5000)
+				       .loanPurpose("for feeding").userPin("1967").userName("blaqmhee").repaymentPreference("CARD").build();
 	}
+	
+	@SneakyThrows
+	@Test void saveLoanApplicationForm_FindSavedLoanApplicationFormByIdTest(){
+		customerService.deleteByUsername("Ghaniy009");
+		RegistrationRequest customer = RegistrationRequest.builder().lastName("AbdulGhaniy").firstName("Yusuf").email("AbdulGhaniyYusuf@gmail.com")
+				                               .password("Yus#luv").username("Ghaniy009").phoneNumber("09045678923").build();
+		customerService.registerCustomer(customer);
+		
+		UserProfileRequest profileRequest = UserProfileRequest.builder().userPin("1999").username("Ghaniy009").houseNumber("32B").city("Ogba")
+				                                    .bvn("3456987521").postCode("09876").streetName("Cole Street").password("Yus#luv")
+				                                    .accountNumber("4532190858").accountName("AbdulGhaniy Yusuf").bankName("Kuda").state("Lagos").build();
+		profileService.saveUserProfile(profileRequest);
+		profileService.saveUserProfile(profileRequest);
+		LoanApplicationRequest request = LoanApplicationRequest.builder().loanAmount(5000).loanPurpose("for education").loanTenure(30).repaymentPreference("card")
+				                                 .password("Yus#luv").userPin("1999").userName("Ghaniy009").build();
+		LoanApplicationResponse applicationResponse = customerService.applyForLoan(request);
+		
+	}
+	
+	@Test void findAllLoanApplicationsWithTheSameLoanStatusTest(){
+	
+	}
+	
+	@Test void findLoanApplicationsGreaterThanAParticularAmountTest(){
+	
+	}
+	@Test void findLoanApplicationsLesserThanAParticularAmountTest(){
+	
+	}
+	
+	
 }

@@ -7,6 +7,7 @@ import com.example.loanapplication.data.dtos.responses.LoanStatusViewResponse;
 import com.example.loanapplication.data.dtos.responses.UserProfileResponse;
 import com.example.loanapplication.data.models.LoanApplicationForm;
 import com.example.loanapplication.data.models.LoanPaymentRecord;
+import com.example.loanapplication.data.models.LoanStatus;
 import com.example.loanapplication.data.repositories.LoanApplicationRepo;
 import com.example.loanapplication.exceptions.LoanApplicationFailedException;
 import com.example.loanapplication.exceptions.NoSuchLoanException;
@@ -50,13 +51,9 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 				.message("Loan Application Successful").build();
 	}
 	
-	//
 	private boolean userLoanRepaymentRecordIsNeutral(LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException {
 		Optional<UserProfileResponse> profileResponse = profileService.findUserProfileByUsername(loanApplicationRequest.getUserName());
-		if (profileResponse.isPresent()){
-			return profileResponse.get().getRecord() == LoanPaymentRecord.NEUTRAL;
-		};
-		return false;
+		return profileResponse.filter(userProfileResponse -> userProfileResponse.getRecord() == LoanPaymentRecord.NEUTRAL).isPresent();
 	}
 	
 	@Override
@@ -65,7 +62,7 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 	}
 	
 	@Override
-	public Optional<List<LoanApplicationResponse>> findAllLoanByLoanStatus() {
+	public Optional<List<LoanApplicationResponse>> findAllLoanByLoanStatus(LoanStatus loanStatus) {
 		return Optional.empty();
 	}
 	
