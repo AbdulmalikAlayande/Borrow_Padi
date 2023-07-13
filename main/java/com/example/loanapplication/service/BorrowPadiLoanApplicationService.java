@@ -12,6 +12,8 @@ import com.example.loanapplication.exceptions.LoanApplicationFailedException;
 import com.example.loanapplication.exceptions.NoSuchLoanException;
 import com.example.loanapplication.exceptions.ObjectDoesNotExistException;
 import com.example.loanapplication.utils.Mapper;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,9 +23,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@NoArgsConstructor
+@AllArgsConstructor
 public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 	@Autowired
 	LoanApplicationRepo applicationRepo;
+	@Autowired
+	UserProfileService profileService;
 	@Override
 	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException{
 		try {
@@ -47,12 +53,8 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 	
 	//
 	private boolean userLoanRepaymentRecordIsNeutral(LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException {
-		UserProfileService profileService = new BorrowPadiUserProfileService();
-		System.out.println("hello world");
 		Optional<UserProfileResponse> profileResponse = profileService.findUserProfileByUsername(loanApplicationRequest.getUserName());
-		System.out.println("hello benin");
 		if (profileResponse.isPresent()){
-			System.out.println("Ahoy world");
 			return profileResponse.get().getRecord() == LoanPaymentRecord.NEUTRAL;
 		};
 		return false;

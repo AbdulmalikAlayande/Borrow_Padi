@@ -5,7 +5,9 @@ import com.example.loanapplication.data.dtos.requests.RegistrationRequest;
 import com.example.loanapplication.data.dtos.requests.UserProfileRequest;
 import com.example.loanapplication.data.dtos.responses.LoanApplicationResponse;
 import com.example.loanapplication.exceptions.LoanApplicationFailedException;
-import com.example.loanapplication.service.*;
+import com.example.loanapplication.service.CustomerService;
+import com.example.loanapplication.service.LoanApplicationService;
+import com.example.loanapplication.service.UserProfileService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,15 +25,9 @@ class LoanApplicationServiceTest {
 	@Autowired
 	LoanApplicationService loanApplicationService;
 	@Autowired
+	UserProfileService profileService;
+	@Autowired
 	CustomerService customerService;
-	
-	@BeforeEach
-	void setUp() {
-	}
-	
-	@AfterEach
-	void tearDown() {
-	}
 	
 	@Test
 	@Disabled
@@ -43,18 +39,18 @@ class LoanApplicationServiceTest {
 	
 	@SneakyThrows
 	@Test void testThatAWarningIsIssuedIfCustomersLoanApplicationRecordIsNeutral(){
-		CustomerService customerService1 = new BorrowPadiCustomerService();
+		customerService.deleteByUsername("Omoyale");
 		RegistrationRequest customer = RegistrationRequest.builder().lastName("Omolanke").firstName("Omiyale").email("ObolankeOmiyale@gmail.com")
 				                               .password("Obol#yale").username("Omoyale").phoneNumber("09156724351").build();
-		customerService1.registerCustomer(customer);
-		UserProfileService profileService = new BorrowPadiUserProfileService();
+		customerService.registerCustomer(customer);
+		
 		UserProfileRequest profileRequest = UserProfileRequest.builder().userPin("1798").username("Omoyale").houseNumber("56K").city("Abule-egba")
 				                                    .bvn("3456987521").postCode("09876").streetName("Alagemo Onire Street").password("Obol#yale")
 				                                    .accountNumber("7897542315").accountName("Obolanke Omiyale").bankName("Palmpay").state("Ogun").build();
 		profileService.saveUserProfile(profileRequest);
 		LoanApplicationRequest request = LoanApplicationRequest.builder().loanAmount(5000).loanPurpose("for feeding").loanTenure(30).repaymentPreference("Cash")
-				                                 .password("Obol#yale").userPin("1798").userName("Oboyale").build();
-		LoanApplicationResponse applicationResponse = customerService1.applyForLoan(request);
+				                                 .password("Obol#yale").userPin("1798").userName("Omoyale").build();
+		LoanApplicationResponse applicationResponse = customerService.applyForLoan(request);
 		assertThat(applicationResponse.getWarning()).isNotNull();
 		assertThat(applicationResponse.getWarning())
 				.isEqualTo("Maintain A good record and pay the loan on time or else you will be black listed");

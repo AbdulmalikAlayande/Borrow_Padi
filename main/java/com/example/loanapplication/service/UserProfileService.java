@@ -11,11 +11,12 @@ public interface UserProfileService {
 	
 	UserProfileResponse saveUserProfile(UserProfileRequest userProfileRequest);
 	Optional<UserProfileResponse> findUserProfileByUsername(String username) throws ObjectDoesNotExistException;
-	void deleteUserByUsernameAndPin(String username, String pin);
 	Optional<UserProfileResponse> findProfileById(String userId) throws ObjectDoesNotExistException;
 	Optional<UserProfileResponse> findProfileByUser(User user);
 	void deleteUserProfileByUserId(String userId);
 	
 	long count();
 	void deleteAll();
+	
+	void deleteByUsername(String username);
 }

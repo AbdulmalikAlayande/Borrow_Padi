@@ -50,7 +50,7 @@ public class Mapper {
 				        .loanPurpose(loanApplicationRequest.getLoanPurpose())
 				        .loanAmount(BigDecimal.valueOf(loanApplicationRequest.getLoanAmount()))
 				        .status(LoanStatus.PENDING)
-				        .repaymentPreference(PaymentMethod.valueOf(loanApplicationRequest.getRepaymentPreference()))
+				        .repaymentPreference(PaymentMethod.valueOf(loanApplicationRequest.getRepaymentPreference().toUpperCase()))
 				        .repaymentDate(repaymentDate)
 				        .requestedTermsAndCondition("You have to payback on the due date")
 				        .build();

@@ -29,5 +29,5 @@ public interface CustomerService {
 	
 	void deleteById(String id);
 	
-	void deleteByUsername(String username);
+	void deleteByUsername(String username) throws ObjectDoesNotExistException;
 }

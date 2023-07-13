@@ -24,6 +24,7 @@ import java.util.Optional;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class BorrowPadiUserProfileService implements UserProfileService{
 	
 	@Autowired
@@ -113,12 +114,11 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 	
 	@Override
 	public Optional<UserProfileResponse> findUserProfileByUsername(String username) throws ObjectDoesNotExistException {
-		System.out.println("ahoy world");
 		Optional<UserProfile> foundUser = userProfileRepo.findByUsername(username);
-		System.out.println("hello boys");
 		Optional<UserProfileResponse> response = buildProfileResponse(foundUser);
-		System.out.println("hello yard men");
-		if (response.isPresent()) return response;
+		if (response.isPresent()) {
+			return response;
+		}
 		throw new ObjectDoesNotExistException("Object does not exist\nCaused by incorrect username or profile that does not exist, Please Set up your profile");
 	}
 	
@@ -155,8 +155,7 @@ public class BorrowPadiUserProfileService implements UserProfileService{
 	}
 	
 	@Override
-	public void deleteUserByUsernameAndPin(String username, String pin) {
-	
+	public void deleteByUsername(String username) {
+		userProfileRepo.deleteByUsername(username);
 	}
-	
 }

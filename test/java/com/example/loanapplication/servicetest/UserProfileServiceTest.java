@@ -61,7 +61,6 @@ class UserProfileServiceTest {
 		Optional<UserProfileResponse> foundProfile = userProfileService.findProfileById(userProfileResponse.getProfileId());
 		foundProfile.ifPresent(profileResponse -> {
 			assertNotNull(profileResponse);
-			System.out.println("aremu");
 			assertNotNull(profileResponse.getProfileId());
 		});
 	}
@@ -80,7 +79,6 @@ class UserProfileServiceTest {
 		Optional<UserProfileResponse> foundProfile = userProfileService.findUserProfileByUsername(userProfileRequest.getUsername());
 		foundProfile.ifPresent(profileResponse -> {
 			assertNotNull(profileResponse);
-			System.out.println("vado");
 			assertNotNull(profileResponse.getProfileId());
 		});
 	}

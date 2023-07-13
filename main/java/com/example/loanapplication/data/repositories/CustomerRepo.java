@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface CustomerRepo extends JpaRepository<Customer, String> {
 	
 	Optional<Customer> findByUser(@NonNull User user);
+	
+	void deleteByUser(@NonNull User user);
 }

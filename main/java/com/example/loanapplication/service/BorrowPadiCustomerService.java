@@ -12,6 +12,7 @@ import com.example.loanapplication.data.repositories.UserRepository;
 import com.example.loanapplication.exceptions.*;
 import com.example.loanapplication.utils.Mapper;
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Slf4j
 @Service
-//@AllArgsConstructor
+@AllArgsConstructor
 //@RequiredArgsConstructor
 public class BorrowPadiCustomerService implements CustomerService{
 	
@@ -302,7 +303,10 @@ public class BorrowPadiCustomerService implements CustomerService{
 	}
 	
 	@Override
-	@Transactional public void deleteByUsername(String username) {
+	@Transactional public void deleteByUsername(String username) throws ObjectDoesNotExistException {
+		Optional<List<User>> foundUser = userRepository.findByUsername(username);
+		userProfileService.deleteByUsername(username);
+		customerRepo.deleteByUser(foundUser.get().get(0));
 		userRepository.deleteByUsername(username);
 	}
 }
