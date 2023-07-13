@@ -12,9 +12,7 @@ import com.example.loanapplication.data.repositories.UserRepository;
 import com.example.loanapplication.exceptions.*;
 import com.example.loanapplication.utils.Mapper;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,7 +39,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 	@Autowired
 	MailService mailService;
 	@Autowired
-	private UserProfileService userProfileService;
+	UserProfileService userProfileService;
 	@Autowired
 	private LoanApplicationService applicationService;
 	
@@ -197,7 +195,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 			BigDecimal loanAmount = BigDecimal.valueOf(loanApplicationRequest.getLoanAmount());
 			boolean isInvalidLoanLimit = loanAmount.compareTo(loanLimit) > 0;
 			boolean isBadRecord = record == LoanPaymentRecord.BAD;
-			// todo throw error different for each checks the record, pending loan and loanlimit
+			// todo throw error different for each checks the record, pending loan and loan limit
 			if (isInvalidLoanLimit || isBadRecord || hasPendingLoan)
 				throw new LoanApplicationFailedException("Loan Application Request Failed::");
 		}

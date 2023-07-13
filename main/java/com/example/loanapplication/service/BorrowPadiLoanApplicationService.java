@@ -4,10 +4,13 @@ import com.example.loanapplication.data.dtos.requests.LoanApplicationRequest;
 import com.example.loanapplication.data.dtos.requests.LoanStatusViewRequest;
 import com.example.loanapplication.data.dtos.responses.LoanApplicationResponse;
 import com.example.loanapplication.data.dtos.responses.LoanStatusViewResponse;
+import com.example.loanapplication.data.dtos.responses.UserProfileResponse;
 import com.example.loanapplication.data.models.LoanApplicationForm;
+import com.example.loanapplication.data.models.LoanPaymentRecord;
 import com.example.loanapplication.data.repositories.LoanApplicationRepo;
 import com.example.loanapplication.exceptions.LoanApplicationFailedException;
 import com.example.loanapplication.exceptions.NoSuchLoanException;
+import com.example.loanapplication.exceptions.ObjectDoesNotExistException;
 import com.example.loanapplication.utils.Mapper;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +46,15 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 	}
 	
 	//
-	private boolean userLoanRepaymentRecordIsNeutral(LoanApplicationRequest loanApplicationRequest) {
+	private boolean userLoanRepaymentRecordIsNeutral(LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException {
+		UserProfileService profileService = new BorrowPadiUserProfileService();
+		System.out.println("hello world");
+		Optional<UserProfileResponse> profileResponse = profileService.findUserProfileByUsername(loanApplicationRequest.getUserName());
+		System.out.println("hello benin");
+		if (profileResponse.isPresent()){
+			System.out.println("Ahoy world");
+			return profileResponse.get().getRecord() == LoanPaymentRecord.NEUTRAL;
+		};
 		return false;
 	}
 	
