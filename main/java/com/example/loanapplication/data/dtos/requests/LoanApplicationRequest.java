@@ -11,12 +11,13 @@ public class LoanApplicationRequest {
 	
 	@NotEmpty
 	private String userName;
+	@NotEmpty
 	private long loanAmount;
-	@NonNull
+	@NotEmpty
 	private String loanPurpose;
-	@NonNull
+	@NotEmpty
 	private String repaymentPreference;
-	@org.springframework.lang.NonNull
+	@NotEmpty
 	private String password;
 	@NotEmpty
 	private String userPin;

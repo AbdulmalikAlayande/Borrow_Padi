@@ -4,9 +4,6 @@ import com.example.loanapplication.data.dtos.requests.LoanApplicationRequest;
 import com.example.loanapplication.data.dtos.requests.RegistrationRequest;
 import com.example.loanapplication.data.dtos.requests.UserProfileRequest;
 import com.example.loanapplication.data.dtos.responses.LoanApplicationResponse;
-import com.example.loanapplication.data.models.Customer;
-import com.example.loanapplication.data.models.User;
-import com.example.loanapplication.data.repositories.CustomerRepo;
 import com.example.loanapplication.exceptions.LoanApplicationFailedException;
 import com.example.loanapplication.service.*;
 import lombok.SneakyThrows;
@@ -16,8 +13,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,19 +36,20 @@ class LoanApplicationServiceTest {
 	@SneakyThrows
 	@Test
 	@Disabled
-	// todo find a way to set the laon application record to BAD and test it to make sure that loan application fail when loan application record is BAD
+	// todo: find a way to set the laon application record to BAD and test it to make sure that loan application fail when loan application record is BAD
+	// todo: maybe using the repo at least just to test
 	void userHasToHaveAGoodLoanRecordOrBeANewUserBeforeTheyCanApplyForLoan(){
 		CustomerService customerService1 = new BorrowPadiCustomerService();
 		RegistrationRequest customer = RegistrationRequest
 				                    .builder()
-				                    .lastName("Obolanke").firstName("Omiyale").email("ObolankeOmiyale@gmail.com")
-						            .password("Obol#yale").username("Oboyale").phoneNumber("09156724351")
+				                    .lastName("Omolanke").firstName("Omiyale").email("ObolankeOmiyale@gmail.com")
+						            .password("Obol#yale").username("Omoyale").phoneNumber("09156724351")
 				                    .build();
 		customerService1.registerCustomer(customer);
 		UserProfileService profileService = new BorrowPadiUserProfileService();
 		UserProfileRequest profileRequest = UserProfileRequest
 				                    .builder()
-				                    .userPin("1798").username("Oboyale").houseNumber("56K").city("Abule-egba")
+				                    .userPin("1798").username("Omoyale").houseNumber("56K").city("Abule-egba")
 				                    .bvn("3456987521").postCode("09876").streetName("Alagemo Onire Street").password("Obol#yale")
 				                    .accountNumber("7897542315").accountName("Obolanke Omiyale").bankName("Palmpay").state("Ogun")
 				                    .build();
@@ -85,7 +81,7 @@ class LoanApplicationServiceTest {
 				                                    .userPin("3456")
 				                                    .userName("blaqmhee")
 				                                    .repaymentPreference("CARD")
-				                                    .build()), "");       ;
+				                                    .build()), "");
 	}
 	
 	@SneakyThrows
@@ -100,7 +96,7 @@ class LoanApplicationServiceTest {
 				       .loanTenure(30)
 				       .loanAmount(5000)
 				       .loanPurpose("for feeding")
-				       .userPin("2339")
+				       .userPin("1967")
 				       .userName("blaqmhee")
 				       .repaymentPreference("CARD")
 				       .build();

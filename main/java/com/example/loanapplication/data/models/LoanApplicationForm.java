@@ -1,5 +1,6 @@
 package com.example.loanapplication.data.models;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,6 +28,7 @@ public class LoanApplicationForm {
 	@NonNull
 	@Enumerated(EnumType.STRING)
 	private LoanStatus status;
+	@Nullable
 	private String loanRejectionReason;
 	@NonNull
 	private LocalDate applicationDate;

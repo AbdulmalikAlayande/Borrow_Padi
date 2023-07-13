@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class LoanApplicationResponse {
 	private String message;
-	
+	private String warning;
 }

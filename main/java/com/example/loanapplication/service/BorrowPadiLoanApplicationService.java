@@ -26,14 +26,25 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 		try {
 			LoanApplicationForm mappedForm = Mapper.map(loanApplicationRequest);
 			applicationRepo.save(mappedForm);
-			return LoanApplicationResponse.builder()
-					       .message("Loan Application Successful")
-					       .build();
+			if(userLoanRepaymentRecordIsNeutral(loanApplicationRequest))
+				return applicationResponseWithWarning();
+			return LoanApplicationResponse.builder().message("Loan Application Successful").build();
 		}catch (Throwable exception){
 			LoanApplicationFailedException failedException = new LoanApplicationFailedException(exception.getMessage());
 			failedException.setCause(exception.getCause());
 			throw failedException;
 		}
+	}
+	
+	private LoanApplicationResponse applicationResponseWithWarning() {
+		return LoanApplicationResponse.builder()
+				       .warning("Maintain A good record and pay the loan on time or else you will be black listed")
+				       .message("Loan Application Successful").build();
+	}
+	
+	//
+	private boolean userLoanRepaymentRecordIsNeutral(LoanApplicationRequest loanApplicationRequest) {
+		return false;
 	}
 	
 	@Override

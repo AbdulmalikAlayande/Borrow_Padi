@@ -152,13 +152,9 @@ public class BorrowPadiCustomerService implements CustomerService{
 				failedException.setCause("Incorrect Pin");
 				Throwable throwable = new Throwable(failedException.getCause());
 				failedException.setCause(throwable.getCause());
-				StackTraceElement[] stackTraceElements = new StackTraceElement[]{
-						new StackTraceElement("BorrowPadiCustomerService", "applyForLoan", "BorrowPadiCustomerService.java", 135),
-						new StackTraceElement("BorrowPadiCustomerService", "validateUserPin", "BorrowPadiCustomerService.java", 140),
-				};
-				failedException.setStackTrace(stackTraceElements);
+				failedException.setStackTrace(throwable.getStackTrace());
 				throw failedException;
-		}
+			}
 		});
 	}
 	
@@ -201,6 +197,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 			BigDecimal loanAmount = BigDecimal.valueOf(loanApplicationRequest.getLoanAmount());
 			boolean isInvalidLoanLimit = loanAmount.compareTo(loanLimit) > 0;
 			boolean isBadRecord = record == LoanPaymentRecord.BAD;
+			// todo throw error different for each checks the record, pending loan and loanlimit
 			if (isInvalidLoanLimit || isBadRecord || hasPendingLoan)
 				throw new LoanApplicationFailedException("Loan Application Request Failed::");
 		}
