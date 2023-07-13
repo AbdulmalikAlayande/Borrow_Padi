@@ -46,9 +46,8 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 	}
 	
 	private LoanApplicationResponse applicationResponseWithWarning() {
-		return LoanApplicationResponse.builder()
-				       .warning("Maintain A good record and pay the loan on time or else you will be black listed")
-				       .message("Loan Application Successful").build();
+		return LoanApplicationResponse.builder().warning("Maintain A good record and pay the loan on time or else you will be black listed")
+				.message("Loan Application Successful").build();
 	}
 	
 	//

@@ -10,6 +10,7 @@ import com.example.loanapplication.data.models.User;
 import com.example.loanapplication.data.repositories.CustomerRepo;
 import com.example.loanapplication.data.repositories.UserRepository;
 import com.example.loanapplication.exceptions.*;
+import com.example.loanapplication.utils.ErrorMessages.*;
 import com.example.loanapplication.utils.Mapper;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.example.loanapplication.utils.ErrorMessages.REGISTRATION_FAILED_MESSAGE;
 
 @Slf4j
 @Service
@@ -63,7 +66,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 				throw new FieldCannotBeEmptyException(exception.getMessage()+"\nThe cause is: "+exception.getCause()+" Error: All fields must be filled");
 			}
 		}
-		else throw new RegistrationFailedException("Seems like you already have an account with us");
+		else throw new RegistrationFailedException(REGISTRATION_FAILED_MESSAGE);
 	}
 	
 	private boolean userDoesNotExistByUsernameAndPassword(String username, String password) throws ObjectDoesNotExistException {
@@ -197,8 +200,9 @@ public class BorrowPadiCustomerService implements CustomerService{
 			boolean isInvalidLoanLimit = loanAmount.compareTo(loanLimit) > 0;
 			boolean isBadRecord = record == LoanPaymentRecord.BAD;
 			// todo throw error different for each checks the record, pending loan and loan limit
-			if (isInvalidLoanLimit || isBadRecord || hasPendingLoan)
-				throw new LoanApplicationFailedException("Loan Application Request Failed::");
+			if (isInvalidLoanLimit) throw new LoanApplicationFailedException("Loan Application Request Failed:: You can't borrow more than your loan limit");
+			if (isBadRecord) throw new LoanApplicationFailedException("Loan Application Request Failed:: sorry you are not eligible for this loan, You do not have a good loan record");
+			if (hasPendingLoan) throw new LoanApplicationFailedException("Loan Application Request Failed:: please repay your pending loan");
 		}
 		catch(Throwable exception){
 			LoanApplicationFailedException failedException = new LoanApplicationFailedException(exception.getMessage());
