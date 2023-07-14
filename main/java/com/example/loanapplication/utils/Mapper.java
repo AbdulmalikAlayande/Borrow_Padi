@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 public class Mapper {
 	
@@ -75,5 +76,16 @@ public class Mapper {
 	public static void map(LoanApplicationForm loanApplicationForm, LoanApplicationResponse loanApplicationResponse) {
 		loanApplicationResponse.setApplicationFormId(loanApplicationForm.getApplicationFormId());
 		loanApplicationResponse.setMessage("Application Successful");
+	}
+	public static void map(LoanApplicationResponse loanApplicationResponse, LoanApplicationForm loanApplicationForm) {
+		loanApplicationResponse.setMessage("Loan Found");
+		loanApplicationResponse.setApplicationFormId(loanApplicationForm.getApplicationFormId());
+	}
+	public static void map(List<LoanApplicationForm> loanApplicationForms, List<LoanApplicationResponse> loanApplicationResponses) {
+		loanApplicationForms.forEach(loanForm->{
+			LoanApplicationResponse loanApplicationResponse = new LoanApplicationResponse();
+			map(loanApplicationResponse, loanForm);
+			loanApplicationResponses.add(loanApplicationResponse);
+		});
 	}
 }

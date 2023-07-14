@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +28,7 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BorrowPadiLoanApplicationService implements LoanApplicationService{
+	private static final String FILE_NAME = "BorrowPadiLoanApplicationService.java";
 	@Autowired
 	LoanApplicationRepo applicationRepo;
 	@Autowired
@@ -62,15 +64,34 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 	public Optional<LoanApplicationResponse> findLoanById(Long loanId) throws NoSuchLoanException{
 		LoanApplicationResponse loanApplicationResponse = new LoanApplicationResponse();
 		Optional<LoanApplicationForm> foundApplicationForm = applicationRepo.findById(loanId);
-		foundApplicationForm.ifPresentOrElse(loanApplicationForm -> Mapper.map(loanApplicationForm, loanApplicationResponse), ()->{
-			throw new NoSuchLoanException("Loan Not Found");
-		});
+		foundApplicationForm
+				.ifPresentOrElse(loanApplicationForm ->
+					Mapper.map(loanApplicationForm, loanApplicationResponse),
+				()-> throwNoSuchLoanException(String.valueOf(loanId), "findLoanById", 68));
 		return Optional.of(loanApplicationResponse);
 	}
 	
 	@Override
 	public Optional<List<LoanApplicationResponse>> findAllLoanByLoanStatus(LoanStatus loanStatus) {
-		return Optional.empty();
+		List<LoanApplicationResponse> loanApplicationResponseList = new ArrayList<>();
+		Optional<List<LoanApplicationForm>> foundApplicationForms = applicationRepo.findAllByStatus(loanStatus);
+		foundApplicationForms
+			.ifPresentOrElse(loanApplicationForms ->
+				loanApplicationForms
+					.stream()
+					.findAny()
+					.ifPresent(elements -> Mapper.map(loanApplicationForms, loanApplicationResponseList)),
+				() -> throwNoSuchLoanException(String.valueOf(loanStatus), "findAllLoanByLoanStatus", 80));
+		return Optional.of(loanApplicationResponseList);
+	}
+	
+	private void throwNoSuchLoanException(String loanIdentity, String methodName, int lineNumber) {
+		NoSuchLoanException exception = new NoSuchLoanException("No loan found, There is no loan with status "+loanIdentity);
+		StackTraceElement[] stackTraceElements = new StackTraceElement[]{
+			new StackTraceElement(String.valueOf(this.getClass()), methodName, FILE_NAME, lineNumber)
+		};
+		exception.setStackTrace(stackTraceElements);
+		throw exception;
 	}
 	
 	@Override

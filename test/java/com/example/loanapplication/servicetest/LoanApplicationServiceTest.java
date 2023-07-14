@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -130,6 +131,7 @@ class LoanApplicationServiceTest {
 		LoanApplicationResponse applicationResponse = customerService.applyForLoan(request);
 		Optional<LoanApplicationResponse> foundLoan = loanApplicationService.findLoanById(applicationResponse.getApplicationFormId());
 		assertThat(foundLoan).isPresent();
+		System.out.println("The id is: "+foundLoan.get().getApplicationFormId());
 		foundLoan.ifPresent(loanApplicationResponse -> {
 			assertThat(loanApplicationResponse.getApplicationFormId()).isNotNull();
 			assertThat(loanApplicationResponse.getApplicationFormId()).isNotNegative();
@@ -137,8 +139,14 @@ class LoanApplicationServiceTest {
 		});
 	}
 	
+	@SneakyThrows
 	@Test void findAllLoanApplicationsWithTheSameLoanStatusTest(){
-	
+		Optional<List<LoanApplicationResponse>> allFoundLoans = loanApplicationService.findAllLoanByLoanStatus(LoanStatus.PENDING);
+		assertThat(allFoundLoans).isPresent();
+		allFoundLoans.ifPresent(listOfLoans -> {
+			assertThat(listOfLoans.stream().findAny()).isPresent();
+			listOfLoans.forEach(x -> assertThat(x).isNotNull());
+		});
 	}
 	
 	@Test void findLoanApplicationsGreaterThanAParticularAmountTest(){
