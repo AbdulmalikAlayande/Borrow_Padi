@@ -111,11 +111,6 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 		return Optional.of(loanApplicationResponseList);
 	}
 	
-	@Override
-	public Optional<List<LoanStatusViewResponse>> getAllLoans(String username, String password) {
-		return Optional.empty();
-	}
-	
 	private void throwNoSuchLoanException(String loanIdentity, String methodName, int lineNumber) {
 		NoSuchLoanException exception = new NoSuchLoanException("No loan found, There is no loan with status "+loanIdentity);
 		StackTraceElement[] stackTraceElements = new StackTraceElement[]{
@@ -124,6 +119,11 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 		};
 		exception.setStackTrace(stackTraceElements);
 		throw exception;
+	}
+	
+	@Override
+	public Optional<List<LoanStatusViewResponse>> getAllLoans(String username, String password) {
+		return Optional.empty();
 	}
 	
 	@Override
