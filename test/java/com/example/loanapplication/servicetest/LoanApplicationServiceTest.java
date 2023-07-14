@@ -144,16 +144,28 @@ class LoanApplicationServiceTest {
 		Optional<List<LoanApplicationResponse>> allFoundLoans = loanApplicationService.findAllLoanByLoanStatus(LoanStatus.PENDING);
 		assertThat(allFoundLoans).isPresent();
 		allFoundLoans.ifPresent(listOfLoans -> {
-			assertThat(listOfLoans.stream().findAny()).isPresent();
-			listOfLoans.forEach(x -> assertThat(x).isNotNull());
+					        assertThat(listOfLoans
+								.stream()
+					            .findAny())
+							.isPresent();
+			listOfLoans.forEach(x -> assertThat(x)
+					   .isNotNull());
 		});
 	}
 	
 	@Test void findLoanApplicationsGreaterThanAParticularAmountTest(){
-	
+		Optional<List<LoanApplicationResponse>> foundLoans = loanApplicationService.findAllByLoanAmountGreaterThan(BigDecimal.valueOf(2000));
+		assertThat(foundLoans.stream().findAny()).isPresent();
+		foundLoans.ifPresent(loanApplicationResponses -> loanApplicationResponses
+				  .forEach(loanForm->assertThat(loanForm)
+				  .isNotNull()));
 	}
 	@Test void findLoanApplicationsLesserThanAParticularAmountTest(){
-	
+		Optional<List<LoanApplicationResponse>> foundLoans = loanApplicationService.findAllByLoanAmountLessThan(BigDecimal.valueOf(10000));
+		assertThat(foundLoans.stream().findAny()).isPresent();
+		foundLoans.ifPresent(loanApplicationResponses -> loanApplicationResponses
+				  .forEach(loanForm->assertThat(loanForm)
+				  .isNotNull()));
 	}
 	
 	
