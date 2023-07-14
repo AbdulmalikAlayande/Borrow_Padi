@@ -85,32 +85,49 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 		return Optional.of(loanApplicationResponseList);
 	}
 	
+	@Override
+	public Optional<List<LoanApplicationResponse>> findAllByLoanAmountGreaterThan(@NonNull BigDecimal loanAmount) {
+		Optional<List<LoanApplicationForm>> foundLoans = applicationRepo.findAllByLoanAmountGreaterThan(loanAmount);
+		String message = "There is no loan greater than the amount ";
+		String methodName ="findAllByLoanAmountGreaterThan";
+		return loanApplicationResponses(foundLoans, loanAmount, message, methodName);
+	}
+	@Override
+	public Optional<List<LoanApplicationResponse>> findAllByLoanAmountLessThan(@NonNull BigDecimal loanAmount) {
+		Optional<List<LoanApplicationForm>> foundLoans = applicationRepo.findAllByLoanAmountLessThan(loanAmount);
+		String message = "There is no loan lesser than the amount ";
+		String methodName = "findAllByLoanAmountLessThan";
+		return loanApplicationResponses(foundLoans, loanAmount, message, methodName);
+	}
+	
+	private Optional<List<LoanApplicationResponse>> loanApplicationResponses(Optional<List<LoanApplicationForm>> foundLoans, BigDecimal loanAmount, String message, String methodName) {
+		List<LoanApplicationResponse> loanApplicationResponseList = new ArrayList<>();
+		foundLoans.ifPresentOrElse(loanApplicationForms->
+				  loanApplicationForms
+				        .stream()
+				        .findAny()
+				        .ifPresent(form-> Mapper.map(loanApplicationForms, loanApplicationResponseList)),
+				  ()-> throwNoSuchLoanException(message+loanAmount, methodName, 106));
+		return Optional.of(loanApplicationResponseList);
+	}
+	
+	@Override
+	public Optional<List<LoanStatusViewResponse>> getAllLoans(String username, String password) {
+		return Optional.empty();
+	}
+	
 	private void throwNoSuchLoanException(String loanIdentity, String methodName, int lineNumber) {
 		NoSuchLoanException exception = new NoSuchLoanException("No loan found, There is no loan with status "+loanIdentity);
 		StackTraceElement[] stackTraceElements = new StackTraceElement[]{
-			new StackTraceElement(String.valueOf(this.getClass()), methodName, FILE_NAME, lineNumber)
+				new StackTraceElement(String.valueOf(this.getClass()), methodName, FILE_NAME, lineNumber),
+				new StackTraceElement(String.valueOf(this.getClass()), "throwNoSuchLoanException", FILE_NAME,95)
 		};
 		exception.setStackTrace(stackTraceElements);
 		throw exception;
 	}
 	
 	@Override
-	public Optional<List<LoanApplicationResponse>> findAllByLoanAmountGreaterThan(@NonNull BigDecimal loanAmount) {
-		return Optional.empty();
-	}
-	
-	@Override
-	public Optional<List<LoanApplicationResponse>> findAllByLoanAmountLessThan(@NonNull BigDecimal loanAmount) {
-		return Optional.empty();
-	}
-	
-	@Override
 	public LoanStatusViewResponse viewLoanStatus(LoanStatusViewRequest loanStatusViewRequest) throws NoSuchLoanException {
 		return null;
-	}
-	
-	@Override
-	public Optional<List<LoanStatusViewResponse>> getAllLoans(String username, String password) {
-		return Optional.empty();
 	}
 }
