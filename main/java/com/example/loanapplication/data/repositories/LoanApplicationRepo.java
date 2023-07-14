@@ -11,7 +11,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface LoanApplicationRepo extends JpaRepository<LoanApplicationForm, String> {
+public interface LoanApplicationRepo extends JpaRepository<LoanApplicationForm, Long> {
 	
 	Optional<List<LoanApplicationForm>> findAllByApplicationDate(LocalDate date);
 	Optional<LoanApplicationForm> findByApplicationDateAndApplicationTime(LocalDate date, LocalTime time);

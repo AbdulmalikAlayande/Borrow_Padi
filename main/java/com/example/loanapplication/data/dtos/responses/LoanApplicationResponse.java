@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class LoanApplicationResponse {
 	private String message;
 	private String warning;
+	private Long ApplicationFormId;
 }

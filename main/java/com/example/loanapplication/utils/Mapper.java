@@ -3,6 +3,7 @@ package com.example.loanapplication.utils;
 import com.example.loanapplication.data.dtos.requests.LoanApplicationRequest;
 import com.example.loanapplication.data.dtos.requests.RegistrationRequest;
 import com.example.loanapplication.data.dtos.requests.UserProfileRequest;
+import com.example.loanapplication.data.dtos.responses.LoanApplicationResponse;
 import com.example.loanapplication.data.dtos.responses.RegisterationResponse;
 import com.example.loanapplication.data.models.*;
 
@@ -63,5 +64,16 @@ public class Mapper {
 				       .bankName(userProfileRequest.getBankName())
 				       .accountNumber(userProfileRequest.getAccountNumber())
 				       .build();
+	}
+	
+	public static LoanApplicationResponse map(LoanApplicationForm loanApplicationForm) {
+		return LoanApplicationResponse.builder()
+				       .ApplicationFormId(loanApplicationForm.getApplicationFormId())
+				       .message("Form Found")
+				       .build();
+	}
+	public static void map(LoanApplicationForm loanApplicationForm, LoanApplicationResponse loanApplicationResponse) {
+		loanApplicationResponse.setApplicationFormId(loanApplicationForm.getApplicationFormId());
+		loanApplicationResponse.setMessage("Application Successful");
 	}
 }

@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -124,11 +125,16 @@ class LoanApplicationServiceTest {
 				                                    .bvn("3456987521").postCode("09876").streetName("Cole Street").password("Yus#luv")
 				                                    .accountNumber("4532190858").accountName("AbdulGhaniy Yusuf").bankName("Kuda").state("Lagos").build();
 		profileService.saveUserProfile(profileRequest);
-		profileService.saveUserProfile(profileRequest);
 		LoanApplicationRequest request = LoanApplicationRequest.builder().loanAmount(5000).loanPurpose("for education").loanTenure(30).repaymentPreference("card")
 				                                 .password("Yus#luv").userPin("1999").userName("Ghaniy009").build();
 		LoanApplicationResponse applicationResponse = customerService.applyForLoan(request);
-		
+		Optional<LoanApplicationResponse> foundLoan = loanApplicationService.findLoanById(applicationResponse.getApplicationFormId());
+		assertThat(foundLoan).isPresent();
+		foundLoan.ifPresent(loanApplicationResponse -> {
+			assertThat(loanApplicationResponse.getApplicationFormId()).isNotNull();
+			assertThat(loanApplicationResponse.getApplicationFormId()).isNotNegative();
+			assertThat(loanApplicationResponse.getApplicationFormId()).isNotZero();
+		});
 	}
 	
 	@Test void findAllLoanApplicationsWithTheSameLoanStatusTest(){

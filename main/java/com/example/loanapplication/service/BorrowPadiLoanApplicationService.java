@@ -35,10 +35,10 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException{
 		try {
 			LoanApplicationForm mappedForm = Mapper.map(loanApplicationRequest);
-			applicationRepo.save(mappedForm);
+			LoanApplicationForm savedForm = applicationRepo.save(mappedForm);
 			if(userLoanRepaymentRecordIsNeutral(loanApplicationRequest))
-				return applicationResponseWithWarning();
-			return LoanApplicationResponse.builder().message("Loan Application Successful").build();
+				return applicationResponseWithWarning(savedForm.getApplicationFormId());
+			return LoanApplicationResponse.builder().message("Loan Application Successful").ApplicationFormId(savedForm.getApplicationFormId()).build();
 		}catch (Throwable exception){
 			LoanApplicationFailedException failedException = new LoanApplicationFailedException(exception.getMessage());
 			failedException.setCause(exception.getCause());
@@ -46,9 +46,11 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 		}
 	}
 	
-	private LoanApplicationResponse applicationResponseWithWarning() {
-		return LoanApplicationResponse.builder().warning("Maintain A good record and pay the loan on time or else you will be black listed")
-				.message("Loan Application Successful").build();
+	private LoanApplicationResponse applicationResponseWithWarning(Long applicationFormId) {
+		return LoanApplicationResponse.builder()
+				       .warning("Maintain A good record and pay the loan on time or else you will be black listed")
+				       .ApplicationFormId(applicationFormId)
+				       .message("Loan Application Successful").build();
 	}
 	
 	private boolean userLoanRepaymentRecordIsNeutral(LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException {
@@ -57,8 +59,13 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 	}
 	
 	@Override
-	public Optional<LoanApplicationResponse> findLoanById(String loanId) throws NoSuchLoanException{
-		return Optional.empty();
+	public Optional<LoanApplicationResponse> findLoanById(Long loanId) throws NoSuchLoanException{
+		LoanApplicationResponse loanApplicationResponse = new LoanApplicationResponse();
+		Optional<LoanApplicationForm> foundApplicationForm = applicationRepo.findById(loanId);
+		foundApplicationForm.ifPresentOrElse(loanApplicationForm -> Mapper.map(loanApplicationForm, loanApplicationResponse), ()->{
+			throw new NoSuchLoanException("Loan Not Found");
+		});
+		return Optional.of(loanApplicationResponse);
 	}
 	
 	@Override

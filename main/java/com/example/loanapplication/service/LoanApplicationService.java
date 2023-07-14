@@ -16,7 +16,7 @@ import java.util.Optional;
 public interface LoanApplicationService {
 	
 	LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException;
-	Optional<LoanApplicationResponse> findLoanById(String loanId) throws NoSuchLoanException;
+	Optional<LoanApplicationResponse> findLoanById(Long loanId) throws NoSuchLoanException;
 	Optional<List<LoanApplicationResponse>> findAllLoanByLoanStatus(LoanStatus loanStatus);
 	Optional<List<LoanApplicationResponse>> findAllByLoanAmountGreaterThan(@NonNull BigDecimal loanAmount);
 	Optional<List<LoanApplicationResponse>> findAllByLoanAmountLessThan(@NonNull BigDecimal loanAmount);
