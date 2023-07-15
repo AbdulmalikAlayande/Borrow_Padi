@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import org.springframework.lang.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Builder
@@ -25,8 +26,7 @@ public class UpdateRequest {
 	private String email;
 	@Nullable
 	private String phoneNumber;
-	@Nullable
-	private List<LoanApplicationForm> applicationFormSet;
+	private List<LoanApplicationForm> applicationFormSet = new ArrayList<>();
 	@Nullable
 	private List<LoanAgreementForm> agreementForms;
 }

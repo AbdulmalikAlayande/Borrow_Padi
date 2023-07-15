@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -45,7 +44,9 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 		try {
 			LoanApplicationForm mappedForm = Mapper.map(loanApplicationRequest);
 			LoanApplicationForm savedForm = applicationRepo.save(mappedForm);
-			Objects.requireNonNull(updateRequest.getApplicationFormSet(), "method getApplicationForm() is null").add(savedForm);
+			List<LoanApplicationForm> listOfForms = updateRequest.getApplicationFormSet();
+			listOfForms.add(savedForm);
+			updateRequest.setApplicationFormSet(listOfForms);
 			customerService.updateDetails(updateRequest);
 			if(userLoanRepaymentRecordIsNeutral(loanApplicationRequest))
 				return applicationResponseWithWarning(savedForm.getApplicationFormId());
