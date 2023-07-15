@@ -17,7 +17,6 @@ import com.example.loanapplication.utils.Mapper;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +35,8 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 	LoanApplicationRepo applicationRepo;
 	@Autowired
 	UserProfileService profileService;
+	
+	
 	@Override
 	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException{
 		CustomerService customerService = new BorrowPadiCustomerService();
@@ -44,7 +45,7 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 		try {
 			LoanApplicationForm mappedForm = Mapper.map(loanApplicationRequest);
 			LoanApplicationForm savedForm = applicationRepo.save(mappedForm);
-			Objects.requireNonNull(updateRequest.getApplicationFormSet()).add(savedForm);
+			Objects.requireNonNull(updateRequest.getApplicationFormSet(), "method getApplicationForm() is null").add(savedForm);
 			customerService.updateDetails(updateRequest);
 			if(userLoanRepaymentRecordIsNeutral(loanApplicationRequest))
 				return applicationResponseWithWarning(savedForm.getApplicationFormId());
