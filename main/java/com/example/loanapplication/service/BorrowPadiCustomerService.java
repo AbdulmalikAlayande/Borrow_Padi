@@ -16,6 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.ObjectNotFoundException;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -133,9 +135,9 @@ public class BorrowPadiCustomerService implements CustomerService{
 	}
 	
 	private void checkForIncorrectPasswordOrUsername(String password, String username) throws LoginFailedException, ObjectDoesNotExistException {
-		Optional<List<User>> foundUser = userRepository.findByUsername(username);
-		if (foundUser.isPresent() && !foundUser.get().isEmpty())
-			if (!foundUser.get().get(0).getPassword().equals(password)) throw new LoginFailedException("Incorrect Password");
+		Optional<User> foundUser = userRepository.findByUsername(username);
+		if (foundUser.isPresent())
+			if (!foundUser.get().getPassword().equals(password)) throw new LoginFailedException("Incorrect Password");
 	}
 	
 	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException, ObjectDoesNotExistException {
@@ -199,7 +201,6 @@ public class BorrowPadiCustomerService implements CustomerService{
 			BigDecimal loanAmount = BigDecimal.valueOf(loanApplicationRequest.getLoanAmount());
 			boolean isInvalidLoanLimit = loanAmount.compareTo(loanLimit) > 0;
 			boolean isBadRecord = record == LoanPaymentRecord.BAD;
-			// todo throw error different for each checks the record, pending loan and loan limit
 			if (isInvalidLoanLimit) throw new LoanApplicationFailedException("Loan Application Request Failed:: You can't borrow more than your loan limit");
 			if (isBadRecord) throw new LoanApplicationFailedException("Loan Application Request Failed:: sorry you are not eligible for this loan, You do not have a good loan record");
 			if (hasPendingLoan) throw new LoanApplicationFailedException("Loan Application Request Failed:: please repay your pending loan");
@@ -229,8 +230,19 @@ public class BorrowPadiCustomerService implements CustomerService{
 	
 	}
 	
-	public UpdateResponse updateDetails(UpdateRequest updateRequest){
-		return null;
+	public UpdateResponse updateDetails(UpdateRequest updateRequest) throws ObjectDoesNotExistException {
+		ModelMapper modelMapper = new ModelMapper();
+		UpdateResponse response = new UpdateResponse();
+		modelMapper.getConfiguration().setSkipNullEnabled(true);
+		Optional<User> foundUser = userRepository.findByUsername(updateRequest.getUsername());
+		return foundUser.map(user -> {
+			Optional<Customer> foundCustomer = customerRepo.findByUser(user);
+			return foundCustomer.map(customer -> {
+				modelMapper.map(updateRequest, foundCustomer);
+				customerRepo.save(customer);
+				return response;
+			}).orElseThrow(()->new ObjectDoesNotExistException("Customer does not exist"));
+		}).orElseThrow(() -> new ObjectDoesNotExistException("User does not exist"));
 	}
 	
 	public LoanStatusViewResponse viewLoanStatus(LoanStatusViewRequest loanStatusViewRequest) throws NoSuchLoanException {
@@ -264,11 +276,11 @@ public class BorrowPadiCustomerService implements CustomerService{
 	
 	@Override
 	public Optional<FoundUserResponse> findCustomerByUsername(String username) throws ObjectDoesNotExistException {
-		Optional<List<User>> foundUsers = userRepository.findByUsername(username);
+		Optional<User> foundUsers = userRepository.findByUsername(username);
 		User user;
 		AtomicBoolean isLoggedIn = new AtomicBoolean();
-		if (foundUsers.isPresent() && !foundUsers.get().isEmpty()) {
-			user = foundUsers.get().get(0);
+		if (foundUsers.isPresent()) {
+			user = foundUsers.get();
 			Optional<Customer> foundCustomer = customerRepo.findByUser(user);
 			foundCustomer.ifPresent(x-> isLoggedIn.set(x.isLoggedIn()));
 			return Optional.of(FoundUserResponse.builder()
@@ -308,9 +320,9 @@ public class BorrowPadiCustomerService implements CustomerService{
 	
 	@Override
 	@Transactional public void deleteByUsername(String username) throws ObjectDoesNotExistException {
-		Optional<List<User>> foundUser = userRepository.findByUsername(username);
+		Optional<User> foundUser = userRepository.findByUsername(username);
 		userProfileService.deleteByUsername(username);
-		customerRepo.deleteByUser(foundUser.get().get(0));
+		customerRepo.deleteByUser(foundUser.get());
 		userRepository.deleteByUsername(username);
 	}
 }

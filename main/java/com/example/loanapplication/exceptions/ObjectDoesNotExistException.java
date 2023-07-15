@@ -4,7 +4,7 @@ import org.hibernate.ObjectNotFoundException;
 import org.hibernate.internal.build.AllowPrintStacktrace;
 
 @AllowPrintStacktrace
-public class ObjectDoesNotExistException extends Exception {
+public class ObjectDoesNotExistException extends RuntimeException {
 	
 	private Throwable cause;
 	private String exceptionCause;

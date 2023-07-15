@@ -17,7 +17,7 @@ public interface CustomerService {
 	LoginResponse login(LoginRequest loginRequest) throws LoginFailedException, ObjectDoesNotExistException;
 	LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException, ObjectDoesNotExistException;
 	void agreeToTermsAndConditionForLoanApplication();
-	UpdateResponse updateDetails(UpdateRequest updateRequest);
+	UpdateResponse updateDetails(UpdateRequest updateRequest) throws ObjectDoesNotExistException;
 	LoanStatusViewResponse viewLoanStatus(LoanStatusViewRequest loanStatusViewRequest) throws NoSuchLoanException;
 	Optional<List<LoanStatusViewResponse>> viewLoanHistory(String username, String password);
 	Optional<LoanStatusViewResponse> viewLoanLimit(String username, String password);

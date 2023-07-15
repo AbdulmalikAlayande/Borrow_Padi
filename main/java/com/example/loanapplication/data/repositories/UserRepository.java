@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, String> {
 	
 	Optional<List<User>> findByUsernameAndPassword(String username, String password) throws ObjectDoesNotExistException;
-	Optional<List<User>> findByUsername(String username) throws ObjectDoesNotExistException;
+	Optional<User> findByUsername(String username) throws ObjectDoesNotExistException;
 	boolean existsByEmailAndPassword(String email, String password);
 	boolean existsByUsername(String username);
 	boolean existsByEmail(String email);
