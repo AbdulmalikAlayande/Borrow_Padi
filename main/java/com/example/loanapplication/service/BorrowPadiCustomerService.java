@@ -10,10 +10,10 @@ import com.example.loanapplication.data.models.User;
 import com.example.loanapplication.data.repositories.CustomerRepo;
 import com.example.loanapplication.data.repositories.UserRepository;
 import com.example.loanapplication.exceptions.*;
-import com.example.loanapplication.utils.ErrorMessages.*;
 import com.example.loanapplication.utils.Mapper;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ import static com.example.loanapplication.utils.ErrorMessages.REGISTRATION_FAILE
 @Slf4j
 @Service
 @AllArgsConstructor
-//@RequiredArgsConstructor
+@NoArgsConstructor
 public class BorrowPadiCustomerService implements CustomerService{
 	
 	public static final String USER_PROFILE_ERROR_MESSAGE = """

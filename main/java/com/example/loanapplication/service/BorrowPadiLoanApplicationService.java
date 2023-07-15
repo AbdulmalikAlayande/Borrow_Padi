@@ -35,6 +35,8 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 	UserProfileService profileService;
 	@Override
 	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException{
+		CustomerService customerService = new BorrowPadiCustomerService();
+		
 		try {
 			LoanApplicationForm mappedForm = Mapper.map(loanApplicationRequest);
 			LoanApplicationForm savedForm = applicationRepo.save(mappedForm);
