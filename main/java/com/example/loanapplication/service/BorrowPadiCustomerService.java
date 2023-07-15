@@ -16,7 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.ObjectNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -143,13 +142,13 @@ public class BorrowPadiCustomerService implements CustomerService{
 	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException, ObjectDoesNotExistException {
 		checkIfUserExists(loanApplicationRequest);
 		checkIfUserProfileIsSetUp(loanApplicationRequest);
-		checkIfUserIsLoggedIn(loanApplicationRequest.getUserName());
+		checkIfUserIsLoggedIn(loanApplicationRequest.getUsername());
 		validateUserPin(loanApplicationRequest);
 		return applicationService.applyForLoan(loanApplicationRequest);
 	}
 	
 	private void validateUserPin(LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException {
-		Optional<UserProfileResponse> foundProfile = userProfileService.findUserProfileByUsername(loanApplicationRequest.getUserName());
+		Optional<UserProfileResponse> foundProfile = userProfileService.findUserProfileByUsername(loanApplicationRequest.getUsername());
 		foundProfile.ifPresent((x)->{
 			if (!Objects.equals(x.getUserPin(), loanApplicationRequest.getUserPin())) {
 				LoanApplicationFailedException failedException = new LoanApplicationFailedException("Loan Application Failed");
@@ -175,7 +174,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 	
 	private void checkIfUserProfileIsSetUp(@NonNull LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException{
 		try{
-			Optional<UserProfileResponse> userFoundByUsername = userProfileService.findUserProfileByUsername(loanApplicationRequest.getUserName());
+			Optional<UserProfileResponse> userFoundByUsername = userProfileService.findUserProfileByUsername(loanApplicationRequest.getUsername());
 			if (userFoundByUsername.isPresent()) {
 				checkUserLoanEligibility(userFoundByUsername, loanApplicationRequest);
 			}
@@ -214,7 +213,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 	}
 	
 	private void checkIfUserExists(@NonNull LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException, ObjectDoesNotExistException {
-		String username = loanApplicationRequest.getUserName();
+		String username = loanApplicationRequest.getUsername();
 		String userPassword = loanApplicationRequest.getPassword();
 		Optional<List<User>> foundUser = userRepository.findByUsernameAndPassword(username, userPassword);
 		if (foundUser.isEmpty()){
@@ -239,7 +238,8 @@ public class BorrowPadiCustomerService implements CustomerService{
 			Optional<Customer> foundCustomer = customerRepo.findByUser(user);
 			return foundCustomer.map(customer -> {
 				modelMapper.map(updateRequest, foundCustomer);
-				customerRepo.save(customer);
+				Customer customer1 = customerRepo.save(customer);
+				modelMapper.map(customer1, response);
 				return response;
 			}).orElseThrow(()->new ObjectDoesNotExistException("Customer does not exist"));
 		}).orElseThrow(() -> new ObjectDoesNotExistException("User does not exist"));
@@ -322,7 +322,7 @@ public class BorrowPadiCustomerService implements CustomerService{
 	@Transactional public void deleteByUsername(String username) throws ObjectDoesNotExistException {
 		Optional<User> foundUser = userRepository.findByUsername(username);
 		userProfileService.deleteByUsername(username);
-		customerRepo.deleteByUser(foundUser.get());
+		foundUser.ifPresent(user -> customerRepo.deleteByUser(foundUser.get()));
 		userRepository.deleteByUsername(username);
 	}
 }

@@ -56,7 +56,7 @@ class LoanApplicationServiceTest {
 		profileRepo.save(userProfile);
 		customerRepo.save(customer);
 		LoanApplicationRequest applicationRequest = LoanApplicationRequest.builder().password(user.getPassword()).loanTenure(30).loanAmount(4000)
-				               .loanPurpose("for feeding").userPin(userProfile.getUserPin()).userName(user.getUsername()).repaymentPreference("card").build();
+				               .loanPurpose("for feeding").userPin(userProfile.getUserPin()).username(user.getUsername()).repaymentPreference("card").build();
 		assertThatThrownBy(()-> customerService.applyForLoan(applicationRequest)).isInstanceOf(LoanApplicationFailedException.class)
 				.hasMessageContaining("You do not have a good loan record");
 	}
@@ -73,7 +73,7 @@ class LoanApplicationServiceTest {
 				                       .accountNumber("7897542315").accountName("Obolanke Omiyale").bankName("Palmpay").state("Ogun").build();
 		profileService.saveUserProfile(profileRequest);
 		LoanApplicationRequest request = LoanApplicationRequest.builder().loanAmount(5000).loanPurpose("for feeding").loanTenure(30).repaymentPreference("Cash")
-				                       .password("Obol#yale").userPin("1798").userName("Omoyale").build();
+				                       .password("Obol#yale").userPin("1798").username("Omoyale").build();
 		LoanApplicationResponse applicationResponse = customerService.applyForLoan(request);
 		assertThat(applicationResponse.getWarning()).isNotNull();
 		assertThat(applicationResponse.getWarning())
@@ -84,24 +84,24 @@ class LoanApplicationServiceTest {
 	@Test void testThatLoanApplicationFailsIfLoanLimitIsExceeded(){
 		assertThrowsExactly(LoanApplicationFailedException.class, ()-> customerService.applyForLoan(LoanApplicationRequest.builder()
 				       .loanAmount(10000).loanPurpose("for feeding").loanTenure(30).repaymentPreference("card")
-				       .password("mk005#$king").userPin("21324").userName("MichealKing005").build()), "You can't borrow more than your loan limit");
+				       .password("mk005#$king").userPin("21324").username("MichealKing005").build()), "You can't borrow more than your loan limit");
 		
 		assertThatThrownBy(()->customerService.applyForLoan(LoanApplicationRequest.builder()
 				          .loanAmount(10000).loanPurpose("for feeding").loanTenure(30).repaymentPreference("card")
-				          .password("mk005#$king").userPin("21324").userName("MichealKing005").build()))
+				          .password("mk005#$king").userPin("21324").username("MichealKing005").build()))
 				.isInstanceOf(LoanApplicationFailedException.class)
 				.hasMessageContaining("You can't borrow more than your loan limit");
 	}
 	
 	@Test void userHasToFillAllNecessaryInformationBeforeTheyAreEligibleToGetLoanAndIfNotLoanApplicationFailedExceptionIsThrown(){
 		assertThrowsExactly(LoanApplicationFailedException.class, ()-> customerService.applyForLoan(LoanApplicationRequest.builder()
-				  .password("ayanniyi@20").userName("blaqmhee").loanTenure(35).userPin("2663").build()), "Loan Application Failed");
+				  .password("ayanniyi@20").username("blaqmhee").loanTenure(35).userPin("2663").build()), "Loan Application Failed");
 	}
 	
 	@Test void testThatLoanApplicationFailsIfPinIsIncorrect(){
 		assertThrowsExactly(LoanApplicationFailedException.class, ()-> customerService.applyForLoan(LoanApplicationRequest.builder()
 				  .password("ayanniyi@20").loanTenure(30).loanAmount(5000).loanPurpose("for feeding")
-				  .userPin("3456").userName("blaqmhee").repaymentPreference("CARD").build()), "Incorrect pin");
+				  .userPin("3456").username("blaqmhee").repaymentPreference("CARD").build()), "Incorrect pin");
 	}
 	
 	@SneakyThrows
@@ -112,7 +112,7 @@ class LoanApplicationServiceTest {
 	
 	private LoanApplicationRequest buildLoanApplicationRequest() {
 		return LoanApplicationRequest.builder().password("ayanniyi@20").loanTenure(30).loanAmount(5000)
-				       .loanPurpose("for feeding").userPin("1967").userName("blaqmhee").repaymentPreference("CARD").build();
+				       .loanPurpose("for feeding").userPin("1967").username("blaqmhee").repaymentPreference("CARD").build();
 	}
 	
 	@SneakyThrows
@@ -127,7 +127,7 @@ class LoanApplicationServiceTest {
 				                                    .accountNumber("4532190858").accountName("AbdulGhaniy Yusuf").bankName("Kuda").state("Lagos").build();
 		profileService.saveUserProfile(profileRequest);
 		LoanApplicationRequest request = LoanApplicationRequest.builder().loanAmount(5000).loanPurpose("for education").loanTenure(30).repaymentPreference("card")
-				                                 .password("Yus#luv").userPin("1999").userName("Ghaniy009").build();
+				                                 .password("Yus#luv").userPin("1999").username("Ghaniy009").build();
 		LoanApplicationResponse applicationResponse = customerService.applyForLoan(request);
 		Optional<LoanApplicationResponse> foundLoan = loanApplicationService.findLoanById(applicationResponse.getApplicationFormId());
 		assertThat(foundLoan).isPresent();

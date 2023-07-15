@@ -5,6 +5,7 @@ import com.example.loanapplication.data.dtos.requests.LoanStatusViewRequest;
 import com.example.loanapplication.data.dtos.responses.LoanApplicationResponse;
 import com.example.loanapplication.data.dtos.responses.LoanStatusViewResponse;
 import com.example.loanapplication.data.dtos.responses.UserProfileResponse;
+import com.example.loanapplication.data.dtos.updaterequests.UpdateRequest;
 import com.example.loanapplication.data.models.LoanApplicationForm;
 import com.example.loanapplication.data.models.LoanPaymentRecord;
 import com.example.loanapplication.data.models.LoanStatus;
@@ -16,12 +17,14 @@ import com.example.loanapplication.utils.Mapper;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -36,10 +39,13 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 	@Override
 	public LoanApplicationResponse applyForLoan(LoanApplicationRequest loanApplicationRequest) throws LoanApplicationFailedException{
 		CustomerService customerService = new BorrowPadiCustomerService();
-		
+		UpdateRequest updateRequest = new UpdateRequest();
+		updateRequest.setUsername(loanApplicationRequest.getUsername());
 		try {
 			LoanApplicationForm mappedForm = Mapper.map(loanApplicationRequest);
 			LoanApplicationForm savedForm = applicationRepo.save(mappedForm);
+			Objects.requireNonNull(updateRequest.getApplicationFormSet()).add(savedForm);
+			customerService.updateDetails(updateRequest);
 			if(userLoanRepaymentRecordIsNeutral(loanApplicationRequest))
 				return applicationResponseWithWarning(savedForm.getApplicationFormId());
 			return LoanApplicationResponse.builder().message("Loan Application Successful").ApplicationFormId(savedForm.getApplicationFormId()).build();
@@ -58,7 +64,7 @@ public class BorrowPadiLoanApplicationService implements LoanApplicationService{
 	}
 	
 	private boolean userLoanRepaymentRecordIsNeutral(LoanApplicationRequest loanApplicationRequest) throws ObjectDoesNotExistException {
-		Optional<UserProfileResponse> profileResponse = profileService.findUserProfileByUsername(loanApplicationRequest.getUserName());
+		Optional<UserProfileResponse> profileResponse = profileService.findUserProfileByUsername(loanApplicationRequest.getUsername());
 		return profileResponse.filter(userProfileResponse -> userProfileResponse.getRecord() == LoanPaymentRecord.NEUTRAL).isPresent();
 	}
 	

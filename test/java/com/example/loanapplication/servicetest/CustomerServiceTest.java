@@ -117,7 +117,7 @@ class CustomerServiceTest {
 	@Test void userHasToSetUpTheirProfileBeforeTheyAreEligibleToApplyForLoanTest() {
 		LoanApplicationRequest applicationRequest = LoanApplicationRequest.builder()
 				                                            .loanAmount(40_000)
-				                                            .userName("Christmas")
+				                                            .username("Christmas")
 				                                            .loanPurpose("For feeding")
 				                                            .userPin("1968")
 				                                            .loanTenure(30)
@@ -132,7 +132,7 @@ class CustomerServiceTest {
 	@RepeatedTest(2) void userHasToRegisterBeforeTheyCanApplyForLoanTest() {
 		LoanApplicationRequest applicationRequest = LoanApplicationRequest.builder()
 				                                            .loanAmount(40_000)
-				                                            .userName("Daniel")
+				                                            .username("Daniel")
 				                                            .loanPurpose("For feeding")
 				                                            .userPin("1968")
 				                                            .loanTenure(30)
@@ -147,7 +147,7 @@ class CustomerServiceTest {
 	@Test void testThatUserPinHasToBeCorrectBeforeTheyCanApplyForLoanOrElseLoanApplicationFailedExceptionIsThrown() {
 		LoanApplicationRequest applicationRequest = LoanApplicationRequest.builder()
 				                                            .loanTenure(30)
-				                                            .userName("Niyi")
+				                                            .username("Niyi")
 				                                            .userPin("1960")
 				                                            .loanPurpose("for food")
 				                                            .password("ayanniyi@20")

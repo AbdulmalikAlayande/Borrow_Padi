@@ -10,7 +10,7 @@ import lombok.*;
 public class LoanApplicationRequest {
 	
 	@NotEmpty
-	private String userName;
+	private String username;
 	@NotEmpty
 	private long loanAmount;
 	@NotEmpty
